@@ -65,4 +65,36 @@ async def bigms(ctx):
     response = "https://cdn.discordapp.com/attachments/740975196558590073/743150977691156660/insta.gif.mp4"
     await ctx.send(response)
 
+def fetchrecent(sub , x = 0):
+    url = makeUrl('', sub)
+    subJson = requests.get(url, headers={'User-Agent': 'MyRedditScraper'}).json()
+    post = subJson['data']['children']
+    try : 
+        imageUrl = (post[x]['data']['url'])
+        imageTitle = (post[x]['data']['title'])
+        if(not('jpg' in imageUrl or 'webm' in imageUrl or 'gif' in imageUrl or 'gifv' in imageUrl or 'png' in imageUrl)):
+            return(fetchrecent(sub , x + 1))
+        else :
+            return(imageUrl , x)
+    except : 
+        return(0 , 0)
+
+@bot.command(name='recent' , help='posts the recent pics in the given subreddit')
+async def recent(ctx):
+    response = (ctx.message.content[7:]).strip()
+    if(len(response) == 0):
+        response = "I can't do anything with an empty message you fucking idiot"
+        await ctx.send(response)
+        return
+    elif ((0 , 0 )!= fetchrecent("https://www.reddit.com/r/"+ response)):
+        x = 0;
+        while((0 , 0 )!= fetchrecent("https://www.reddit.com/r/"+ response , x)):
+            (url  , x ) = fetchrecent("https://www.reddit.com/r/"+ response , x)
+            x+=1
+            await ctx.send(url)
+        return
+    else:
+        response = "Sorry, couldn't find a pic :sob:"
+        await ctx.send(response)
+
 bot.run(TOKEN)

@@ -13,6 +13,7 @@ bot = commands.Bot(command_prefix='^')
 
 @bot.event
 async def on_ready():
+    await bot.change_presence(activity=discord.Game(name="with my balls"))
     print(f'{bot.user.name} has connected to Discord!')
     
 @bot.event

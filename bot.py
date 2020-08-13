@@ -111,7 +111,12 @@ async def recent(ctx):
         response = "Sometimes I wonder how dumb can a human be"
         await ctx.send(response)
         return
-    cnt = int(cnt)
+    try : 
+        cnt = int(cnt)
+    except : 
+        response = "https://media.discordapp.net/attachments/707823346326306887/743421313414201444/2Q.png"
+        await ctx.send(response)
+        return
     if (len(response) == 0):
         response = "I can't do anything with an empty message you fucking idiot"
         await ctx.send(response)

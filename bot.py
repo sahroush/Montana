@@ -55,7 +55,6 @@ async def latest(ctx):
 @bot.command(name='echo' , help='Repeats a given message')
 async def echo(ctx):
     response = (ctx.message.content[5:]).strip()
-    print(response)
     if(len(response) == 0):
         response = "I can't send an empty message you fucking idiot"
     await ctx.send(response)
@@ -91,5 +90,9 @@ async def recent(ctx):
     else:
         response = "Sorry, couldn't find a pic :sob:"
         await ctx.send(response)
+        
+@bot.command(name='ping' , help="Used to test Montana's response time.")
+async def ping(ctx):
+    await ctx.send(f'Pong! {round (bot.latency * 1000)}ms ')
 
 bot.run(TOKEN)

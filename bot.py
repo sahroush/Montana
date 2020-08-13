@@ -103,6 +103,10 @@ def getsubsize(sub):
 @bot.command(name='recent', help='posts x = 20 of the most recent pics from the given subreddit')
 async def recent(ctx):
     response = (ctx.message.content[7:]).strip().split();
+    if (len(response) == 0):
+        response = "I can't do anything with an empty message you fucking idiot"
+        await ctx.send(response)
+        return
     sz = getsubsize("https://www.reddit.com/r/" + response[0]);  # size sub ro begir
     if (len(response) == 1):
         response = response[0]
@@ -117,10 +121,6 @@ async def recent(ctx):
         cnt = int(cnt)
     except:
         response = "https://media.discordapp.net/attachments/707823346326306887/743421313414201444/2Q.png"
-        await ctx.send(response)
-        return
-    if (len(response) == 0):
-        response = "I can't do anything with an empty message you fucking idiot"
         await ctx.send(response)
         return
     if (cnt <= 0 or cnt != int(cnt)):

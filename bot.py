@@ -85,6 +85,7 @@ def fetchrecent(sub, x=0):
     except:
         return (0, 0)
 
+
 def getsubsize(sub):
     url = makeUrl('', sub)
     subJson = requests.get(url, headers={'User-Agent': 'MyRedditScraper'}).json()
@@ -96,24 +97,25 @@ def getsubsize(sub):
         if (('jpg' in imageUrl or 'webm' in imageUrl or 'gif' in imageUrl or 'gifv' in imageUrl or 'png' in imageUrl)):
             mark = 1;
             stuff += [[imageUrl, imageTitle]]
-    return(len(stuff))
+    return (len(stuff))
+
 
 @bot.command(name='recent', help='posts x = 20 of the most recent pics from the given subreddit')
 async def recent(ctx):
     response = (ctx.message.content[7:]).strip().split();
-    sz = getsubsize("https://www.reddit.com/r/" + response[0]); #size sub ro begir
-    if(len(response) == 1):
+    sz = getsubsize("https://www.reddit.com/r/" + response[0]);  # size sub ro begir
+    if (len(response) == 1):
         response = response[0]
         cnt = sz
-    elif(len(response) == 2): 
-        response  , cnt = response 
-    else :
+    elif (len(response) == 2):
+        response, cnt = response
+    else:
         response = "Sometimes I wonder how dumb can a human be"
         await ctx.send(response)
         return
-    try : 
+    try:
         cnt = int(cnt)
-    except : 
+    except:
         response = "https://media.discordapp.net/attachments/707823346326306887/743421313414201444/2Q.png"
         await ctx.send(response)
         return
@@ -121,18 +123,18 @@ async def recent(ctx):
         response = "I can't do anything with an empty message you fucking idiot"
         await ctx.send(response)
         return
-    if(cnt <= 0 or cnt!=int(cnt)):
+    if (cnt <= 0 or cnt != int(cnt)):
         response = "What did you expect moron"
         await ctx.send(response)
         return
-    elif(sz == 0):
+    elif (sz == 0):
         response = "Sorry, couldn't find a pic :sob:"
         await ctx.send(response)
         return
-    else :
-        if(cnt > sz):
-            await ctx.send("I'm sorry I could only find " + str(sz) + " pics, anyways here you go :blush:" )
-        cnt = min(cnt , sz)
+    else:
+        if (cnt > sz):
+            await ctx.send("I'm sorry I could only find " + str(sz) + " pics, anyways here you go :blush:")
+        cnt = min(cnt, sz)
         x = 0
         while ((0, 0) != fetchrecent("https://www.reddit.com/r/" + response, x) and cnt > 0):
             (url, x) = fetchrecent("https://www.reddit.com/r/" + response, x)
@@ -140,6 +142,7 @@ async def recent(ctx):
             cnt -= 1;
             await ctx.send(url)
         return
+
 
 @bot.command(name='ping', help="Used to test Montana's response time.")
 async def ping(ctx):

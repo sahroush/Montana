@@ -60,11 +60,6 @@ async def echo(ctx):
         response = "I can't send an empty message you fucking idiot"
     await ctx.send(response)
 
-@bot.command(name='bigms' , help='Responds with BIGMS')
-async def bigms(ctx):
-    response = "https://cdn.discordapp.com/attachments/740975196558590073/743150977691156660/insta.gif.mp4"
-    await ctx.send(response)
-
 def fetchrecent(sub , x = 0):
     url = makeUrl('', sub)
     subJson = requests.get(url, headers={'User-Agent': 'MyRedditScraper'}).json()

@@ -142,8 +142,5 @@ async def recent(ctx):
         return
     await ctx.send(rnd("https://www.reddit.com/r/" + response))
 
-@bot.command(name = 'waturr', help = 'sends :waturr:')
-async def waturr(ctx):
-    await ctx.send("<:waturr:741721372799139907>")
 
 bot.run(TOKEN)

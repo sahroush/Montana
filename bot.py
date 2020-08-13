@@ -101,5 +101,31 @@ async def ping(ctx):
 @bot.command(name='uptime' , help="Prints bot uptime")
 async def uptime(ctx):
     await ctx.send("Montana has been running for " + str(int((time.time() - starting_time)//60)) + " minutes")
+    
+def rnd(sub):
+    url = makeUrl('', sub)
+    subJson = requests.get(url, headers={'User-Agent': 'MyRedditScraper'}).json()
+    post = subJson['data']['children']
+    mark = 0
+    stuff = []
+    for i in range(len(post)):
+        imageUrl = (post[i]['data']['url'])
+        imageTitle = (post[i]['data']['title'])
+        if(('jpg' in imageUrl or 'webm' in imageUrl or 'gif' in imageUrl or 'gifv' in imageUrl or 'png' in imageUrl)):
+            mark = 1;
+            stuff += [[imageUrl , imageTitle]]
+    if(mark == 0):
+        return("Sorry, couldn't find a pic :sob:");
+    x = random.randint(0 , len(stuff)-1);
+    return(stuff[x][0])
+
+@bot.command(name='random' , help='posts a random pic from the given subreddit')
+async def recent(ctx):
+    response = (ctx.message.content[7:]).strip()
+    if(len(response) == 0):
+        response = "I can't do anything with an empty message you fucking idiot"
+        await ctx.send(response)
+        return
+    await ctx.send(rnd("https://www.reddit.com/r/"+ response))
 
 bot.run(TOKEN)

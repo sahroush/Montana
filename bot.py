@@ -90,6 +90,9 @@ def fetchrecent(sub, x=0):
 async def recent(ctx):
     response, cnt = (ctx.message.content[7:]).strip().split();
     cnt = int(cnt)
+    if (cnt > 27):
+        await ctx.send("bitch i can only send 27 bla bla at most, wtf?")
+    cnt = min(cnt, 27);
     if (len(response) == 0):
         response = "I can't do anything with an empty message you fucking idiot"
         await ctx.send(response)

@@ -11,8 +11,11 @@ TOKEN = "Njk5NTk5MzkwNDMxNzcyNzMz" + ".XpWutA.0nvimxpX" + "AW7uNlwRD"+"wW1aok8Zv
 
 bot = commands.Bot(command_prefix='^')
 
+starting_time = time.time()
+
 @bot.event
 async def on_ready():
+    starting_time = time.time()
     await bot.change_presence(activity=discord.Game(name="with my balls"))
     print(f'{bot.user.name} has connected to Discord!')
     
@@ -94,5 +97,9 @@ async def recent(ctx):
 @bot.command(name='ping' , help="Used to test Montana's response time.")
 async def ping(ctx):
     await ctx.send(f'Pong! {round (bot.latency * 1000)}ms ')
+
+@bot.command(name='uptime' , help="Prints bot uptime")
+async def uptime(ctx):
+    await ctx.send("Montana has been running for " + str(int((time.time() - starting_time)//60)) + " minutes")
 
 bot.run(TOKEN)

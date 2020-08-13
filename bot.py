@@ -85,29 +85,60 @@ def fetchrecent(sub, x=0):
     except:
         return (0, 0)
 
+def getsubsize(sub):
+    url = makeUrl('', sub)
+    subJson = requests.get(url, headers={'User-Agent': 'MyRedditScraper'}).json()
+    post = subJson['data']['children']
+    stuff = []
+    for i in range(len(post)):
+        imageUrl = (post[i]['data']['url'])
+        imageTitle = (post[i]['data']['title'])
+        if (('jpg' in imageUrl or 'webm' in imageUrl or 'gif' in imageUrl or 'gifv' in imageUrl or 'png' in imageUrl)):
+            mark = 1;
+            stuff += [[imageUrl, imageTitle]]
+    return(len(stuff))
 
-@bot.command(name='recent', help='posts the recent pics in the given subreddit')
+@bot.command(name='recent', help='posts x = 20 of the most recent pics from the given subreddit')
 async def recent(ctx):
-    response = (ctx.message.content[7:]).strip()
+    response = (ctx.message.content[7:]).strip().split();
+    sz = getsubsize("https://www.reddit.com/r/" + response[0]); #size sub ro begir
+    if(len(response) == 1):
+        response = response[0]
+        cnt = sz
+    elif(len(response) == 2): 
+        response  , cnt = response 
+    else :
+        response = "Sometimes I wonder how dumb can a human be"
+        await ctx.send(response)
+        return
+    cnt = int(cnt)
     if (len(response) == 0):
         response = "I can't do anything with an empty message you fucking idiot"
         await ctx.send(response)
         return
-    elif ((0, 0) != fetchrecent("https://www.reddit.com/r/" + response)):
-        x = 0;
-        while ((0, 0) != fetchrecent("https://www.reddit.com/r/" + response, x)):
-            (url, x) = fetchrecent("https://www.reddit.com/r/" + response, x)
-            x += 1
-            await ctx.send(url)
+    if(cnt <= 0 or cnt!=int(cnt)):
+        response = "What did you expect moron"
+        await ctx.send(response)
         return
-    else:
+    elif(sz == 0):
         response = "Sorry, couldn't find a pic :sob:"
         await ctx.send(response)
-
+        return
+    else :
+        if(cnt > sz):
+            await ctx.send("I'm sorry I could only find " + str(sz) + " pics, anyways here you go :blush:" )
+        cnt = min(cnt , sz)
+        x = 0
+        while ((0, 0) != fetchrecent("https://www.reddit.com/r/" + response, x) and cnt > 0):
+            (url, x) = fetchrecent("https://www.reddit.com/r/" + response, x)
+            x += 1
+            cnt -= 1;
+            await ctx.send(url)
+        return
 
 @bot.command(name='ping', help="Used to test Montana's response time.")
 async def ping(ctx):
-    await ctx.send(f'Pong! {round(bot.latency * 1000)}ms ')
+    await ctx.send(f'Pong! {int(round(bot.latency * 1000))}ms ')
 
 
 @bot.command(name='uptime', help="Prints bot uptime")
@@ -115,7 +146,7 @@ async def uptime(ctx):
     await ctx.send("Montana has been running for " + str(int((time.time() - starting_time) // 60)) + " minutes")
 
 
-def rnd(sub):
+def rnd(sub, ):
     url = makeUrl('', sub)
     subJson = requests.get(url, headers={'User-Agent': 'MyRedditScraper'}).json()
     post = subJson['data']['children']
@@ -130,6 +161,7 @@ def rnd(sub):
     if (mark == 0):
         return ("Sorry, couldn't find a pic :sob:");
     x = random.randint(0, len(stuff) - 1);
+
     return (stuff[x][0])
 
 
@@ -142,8 +174,5 @@ async def recent(ctx):
         return
     await ctx.send(rnd("https://www.reddit.com/r/" + response))
 
-@bot.command(name = 'waturr', help = 'sends :waturr:')
-async def waturr(ctx):
-    await ctx.send(":waturr:")
 
 bot.run(TOKEN)

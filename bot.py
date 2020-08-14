@@ -115,15 +115,11 @@ async def album(ctx ,sub , *args):
                 await ctx.message.delete()
                 return
 
-        except asyncio.TimeoutError:
+        except:
             await message.delete()
-            await ctx.delete()
+            await ctx.message.delete()
             return;
-    
-@album.error
-async def album_error_handler(ctx , error):
-    response = "you probably did something idiotic"
-    await ctx.send(response)
+
     
 
 @bot.command(name='ping', help="Used to test Montana's response time.")

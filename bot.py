@@ -85,23 +85,17 @@ def getsubsize(sub):
     except :
         return (0)
 
+zede_maraz = random.randint(0 , 1 << 62);
 
 @bot.command(name='recent', help='posts the most recent pics from the given subreddit' , usage = "[subreddit...] [cnt = subsize...]")
-async def recent(ctx , *args):
-    cnt = (1 << 60)
-    sub = ""
-    for arg in args :
-        try:
-            cnt = int(arg)
-        except:
-            sub = arg
+async def recent(ctx ,sub , cnt =  zede_maraz):
     sub = "https://www.reddit.com/r/" + sub
     sz = getsubsize(sub);
     if (cnt <= 0):
         response = "What did you expect moron"
         await ctx.send(response)
         return
-    if(cnt == (1 << 60)):
+    if(cnt == zede_maraz):
         cnt = sz;
     if(sz == 0):
         response = "Sorry, couldn't find a pic :sob:"
@@ -117,6 +111,14 @@ async def recent(ctx , *args):
         cnt -= 1;
         await ctx.send(url)
     return
+    
+
+@recent.error
+async def recent_error_handler(ctx , error):
+    response = "you probably did something idiotic"
+    await ctx.send(response)
+    
+
 @bot.command(name='ping', help="Used to test Montana's response time.")
 async def ping(ctx):
     start = time.perf_counter()
@@ -151,15 +153,12 @@ def rnd(sub):
 
 
 @bot.command(name='random', help='posts a random pic from the given subreddit', usage = "[subreddit...]")
-async def rndom(ctx , *args):
-    sub = ""
-    for arg in args :
-        sub = arg
-    if (len(sub) == 0):
-        response = "I can't do anything with an empty message you fucking idiot"
-        await ctx.send(response)
-        return
+async def rndom(ctx , sub):
     await ctx.send(rnd("https://www.reddit.com/r/" + sub))
 
+@rndom.error
+async def recent_error_handler(ctx , error):
+    response = "you probably did something stupid"
+    await ctx.send(response)
 
 bot.run(TOKEN)

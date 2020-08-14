@@ -30,20 +30,23 @@ async def on_member_join(member):
 def makeUrl(afterID, subreddit):
     return subreddit.split('/.json')[0] + "/.json?after={}".format(afterID)
 
+def ismedia(imageUrl):
+    return(('.jpg' in imageUrl or '.webm' in imageUrl or '.gif' in imageUrl or '.gifv' in imageUrl or '.png' in imageUrl))
 
-def fetch(sub, x=0):
-    url = makeUrl('', sub)
-    subJson = requests.get(url, headers={'User-Agent': 'MyRedditScraper'}).json()
-    post = subJson['data']['children']
-    if (len(post) < x):
-        return (0)
-    imageUrl = (post[x]['data']['url'])
-    imageTitle = (post[x]['data']['title'])
-    if (not ('.jpg' in imageUrl or '.webm' in imageUrl or '.gif' in imageUrl or '.gifv' in imageUrl or '.png' in imageUrl)):
-        return (fetch(sub, x + 1))
-    else:
-        return (imageUrl, imageTitle)
-        
+def fetch(sub):
+    url = makeUrl('',"https://www.reddit.com/r/"+sub)
+    subJson = requests.get(url, headers={'User-Agent': 'Montana'}).json()
+    posts = subJson['data']['children']
+    sfw = []
+    nsfw = []
+    for post in posts:
+        ismed = ismedia(post['data']['url'])
+        if(ismed and post['data']['over_18']):
+            nsfw += [[post['data']['title'] , post['data']['url']]]
+        elif(ismed):
+            sfw  += [[post['data']['title'] , post['data']['url']]]
+    return(sfw , nsfw)
+
 
 @bot.command(name='echo', help='Repeats a given message' , usage = "[message...]")
 async def echo(ctx , *response):
@@ -52,69 +55,73 @@ async def echo(ctx , *response):
     await ctx.send(" ".join(response))
 
 
-def fetchrecent(sub, x=0):
-    url = makeUrl('', sub)
-    subJson = requests.get(url, headers={'User-Agent': 'MyRedditScraper'}).json()
-    post = subJson['data']['children']
-    try:
-        imageUrl = (post[x]['data']['url'])
-        imageTitle = (post[x]['data']['title'])
-        if (
-                not (
-                        '.jpg' in imageUrl or '.webm' in imageUrl or '.gif' in imageUrl or '.gifv' in imageUrl or '.png' in imageUrl)):
-            return (fetchrecent(sub, x + 1))
-        else:
-            return (imageUrl, x)
-    except:
-        return (0, 0)
-
-
-def getsubsize(sub):
-    try:
-        url = makeUrl('', sub)
-        subJson = requests.get(url, headers={'User-Agent': 'MyRedditScraper'}).json()
-        post = subJson['data']['children']
-        stuff = []
-        for i in range(len(post)):
-            imageUrl = (post[i]['data']['url'])
-            imageTitle = (post[i]['data']['title'])
-            if (('.jpg' in imageUrl or '.webm' in imageUrl or '.gif' in imageUrl or '.gifv' in imageUrl or '.png' in imageUrl)):
-                mark = 1;
-                stuff += [[imageUrl, imageTitle]]
-        return (len(stuff))
-    except :
-        return (0)
-
 zede_maraz = random.randint(0 , 1 << 62);
 
-@bot.command(name='recent', help='posts the most recent pics from the given subreddit' , usage = "[subreddit...] [cnt = subsize...]")
-async def recent(ctx ,sub , cnt =  zede_maraz):
-    sub = "https://www.reddit.com/r/" + sub
-    sz = getsubsize(sub);
-    if (cnt <= 0):
-        response = "What did you expect moron"
-        await ctx.send(response)
-        return
-    if(cnt == zede_maraz):
-        cnt = sz;
-    if(sz == 0):
+
+@bot.command(name='album', help='posts the most recent pics from the given subreddit \n'+
+'nsfw is off in sfw channels unless +nsfw is used \n'+
+'shuffles posts when +random is used ' ,usage = "<subreddit> [+nsfw][+random]")
+async def album(ctx ,sub , *args):
+    sfw , nsfw = fetch(sub)
+    posts = sfw
+    if("+nsfw" in args or ctx.channel.is_nsfw()):
+        posts += nsfw
+    if(len(posts) == 0):
         response = "Sorry, couldn't find a pic :sob:"
         await ctx.send(response)
         return
-    if (cnt > sz):
-        await ctx.send("I'm sorry I could only find " + str(sz) + " pics, anyways here you go :blush:")
-    cnt = min(cnt, sz)
-    x = 0
-    while ((0, 0) != fetchrecent(sub, x) and cnt > 0):
-        (url, x) = fetchrecent(sub, x)
-        x += 1
-        cnt -= 1;
-        await ctx.send(url)
-    return
+    if("+random" in args):
+        random.shuffle(posts)
+    cur = 0
+    message = await ctx.send(posts[0][1]);
+    emojis = ["⏪" , "⏩" , "❌"]
     
+    def check(reaction, user):
+        return user == ctx.author and str(reaction.emoji) in emojis
+        
+    await message.clear_reactions()
+    if(cur > 0):
+        await message.add_reaction("⏪")
+    if(len(posts)-1 > cur):
+        await message.add_reaction("⏩")
+    await message.add_reaction("❌")
+    
+    while(True):
+        try:
+            reaction, user = await bot.wait_for("reaction_add", timeout=10, check=check)
+            if str(reaction.emoji) == "⏩":
+                cur+=1
+                await message.edit(content=posts[cur][1])
+                await message.clear_reactions()
+                if(cur > 0):
+                    await message.add_reaction("⏪")
+                if(len(posts)-1 > cur):
+                    await message.add_reaction("⏩")
+                await message.add_reaction("❌")
+                
+            if str(reaction.emoji) == "⏪":
+                cur-=1
+                await message.edit(content=posts[cur][1])
+                await message.clear_reactions()
+                if(cur > 0):
+                    await message.add_reaction("⏪")
+                if(len(posts)-1 > cur):
+                    await message.add_reaction("⏩")
+                await message.add_reaction("❌")
+                
+            if str(reaction.emoji) == "❌":
+                await message.clear_reactions()
+                await message.delete()
+                await ctx.message.delete()
+                return
 
-@recent.error
-async def recent_error_handler(ctx , error):
+        except asyncio.TimeoutError:
+            await message.delete()
+            await ctx.delete()
+            return;
+    
+@album.error
+async def album_error_handler(ctx , error):
     response = "you probably did something idiotic"
     await ctx.send(response)
     
@@ -131,34 +138,5 @@ async def ping(ctx):
 @bot.command(name='uptime', help="Prints bot uptime")
 async def uptime(ctx):
     await ctx.send("Montana has been running for " + str(int((time.time() - starting_time) // 60)) + " minutes")
-
-
-def rnd(sub):
-    url = makeUrl('', sub)
-    subJson = requests.get(url, headers={'User-Agent': 'MyRedditScraper'}).json()
-    post = subJson['data']['children']
-    mark = 0
-    stuff = []
-    for i in range(len(post)):
-        imageUrl = (post[i]['data']['url'])
-        imageTitle = (post[i]['data']['title'])
-        if (('.jpg' in imageUrl or '.webm' in imageUrl or '.gif' in imageUrl or '.gifv' in imageUrl or '.png' in imageUrl)):
-            mark = 1;
-            stuff += [[imageUrl, imageTitle]]
-    if (mark == 0):
-        return ("Sorry, couldn't find a pic :sob:");
-    x = random.randint(0, len(stuff) - 1);
-
-    return (stuff[x][0])
-
-
-@bot.command(name='random', help='posts a random pic from the given subreddit', usage = "[subreddit...]")
-async def rndom(ctx , sub):
-    await ctx.send(rnd("https://www.reddit.com/r/" + sub))
-
-@rndom.error
-async def recent_error_handler(ctx , error):
-    response = "you probably did something stupid"
-    await ctx.send(response)
 
 bot.run(TOKEN)

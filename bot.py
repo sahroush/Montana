@@ -39,7 +39,7 @@ def fetch(sub, x=0):
         return (0)
     imageUrl = (post[x]['data']['url'])
     imageTitle = (post[x]['data']['title'])
-    if (not ('jpg' in imageUrl or 'webm' in imageUrl or 'gif' in imageUrl or 'gifv' in imageUrl or 'png' in imageUrl)):
+    if (not ('.jpg' in imageUrl or '.webm' in imageUrl or '.gif' in imageUrl or '.gifv' in imageUrl or '.png' in imageUrl)):
         return (fetch(sub, x + 1))
     else:
         return (imageUrl, imageTitle)
@@ -61,7 +61,7 @@ def fetchrecent(sub, x=0):
         imageTitle = (post[x]['data']['title'])
         if (
                 not (
-                        'jpg' in imageUrl or 'webm' in imageUrl or 'gif' in imageUrl or 'gifv' in imageUrl or 'png' in imageUrl)):
+                        '.jpg' in imageUrl or '.webm' in imageUrl or '.gif' in imageUrl or '.gifv' in imageUrl or '.png' in imageUrl)):
             return (fetchrecent(sub, x + 1))
         else:
             return (imageUrl, x)
@@ -78,7 +78,7 @@ def getsubsize(sub):
         for i in range(len(post)):
             imageUrl = (post[i]['data']['url'])
             imageTitle = (post[i]['data']['title'])
-            if (('jpg' in imageUrl or 'webm' in imageUrl or 'gif' in imageUrl or 'gifv' in imageUrl or 'png' in imageUrl)):
+            if (('.jpg' in imageUrl or '.webm' in imageUrl or '.gif' in imageUrl or '.gifv' in imageUrl or '.png' in imageUrl)):
                 mark = 1;
                 stuff += [[imageUrl, imageTitle]]
         return (len(stuff))
@@ -142,7 +142,7 @@ def rnd(sub):
     for i in range(len(post)):
         imageUrl = (post[i]['data']['url'])
         imageTitle = (post[i]['data']['title'])
-        if (('jpg' in imageUrl or 'webm' in imageUrl or 'gif' in imageUrl or 'gifv' in imageUrl or 'png' in imageUrl)):
+        if (('.jpg' in imageUrl or '.webm' in imageUrl or '.gif' in imageUrl or '.gifv' in imageUrl or '.png' in imageUrl)):
             mark = 1;
             stuff += [[imageUrl, imageTitle]]
     if (mark == 0):

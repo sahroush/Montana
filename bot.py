@@ -41,6 +41,10 @@ def fetch(sub, x=0):
     imageUrl = (post[x]['data']['url'])
     imageTitle = (post[x]['data']['title'])
     over_18 = (post[x]['data']['over_18'])
+    if ctx.channel.is_nsfw():
+        NSFW_CONTENT = 1
+    else : 
+        NSFW_CONTENT = 0
     if (not ('.jpg' in imageUrl or
              '.webm' in imageUrl or
              '.gif' in imageUrl or
@@ -67,12 +71,16 @@ def fetchrecent(sub, x=0):
         imageUrl = (post[x]['data']['url'])
         imageTitle = (post[x]['data']['title'])
         over_18 = (post[x]['data']['over_18'])
+        if ctx.channel.is_nsfw():
+            NSFW_CONTENT = 1
+        else : 
+            NSFW_CONTENT = 0
         if (not ('.jpg' in imageUrl or
                  '.webm' in imageUrl or
                  '.gif' in imageUrl or
                  '.gifv' in imageUrl or
                  '.png' in imageUrl)
-                or (not NSFW_CONTENT and over_18)):
+               or (not NSFW_CONTENT and over_18)):
             return fetchrecent(sub, x + 1)
         else:
             return imageUrl, x
@@ -95,7 +103,7 @@ def getsubsize(sub):
                  '.gif' in imageUrl or
                  '.gifv' in imageUrl or
                  '.png' in imageUrl)
-                    and (NSFW_CONTENT or not over_18)):
+               or (not NSFW_CONTENT and over_18)):
                 stuff += [[imageUrl, imageTitle]]
         return len(stuff)
     except:
@@ -105,6 +113,10 @@ zede_maraz = random.randint(0 , 1 << 62);
 
 @bot.command(name='recent', help='posts the most recent pics from the given subreddit' , usage = "[subreddit...] [cnt = subsize...]")
 async def recent(ctx ,sub , cnt =  zede_maraz):
+    if ctx.channel.is_nsfw():
+        NSFW_CONTENT = 1
+    else : 
+        NSFW_CONTENT = 0
     sub = "https://www.reddit.com/r/" + sub
     sz = getsubsize(sub);
     if (cnt <= 0):
@@ -170,6 +182,10 @@ def rnd(sub):
 
 @bot.command(name='random', help='posts a random pic from the given subreddit', usage = "[subreddit...]")
 async def rndom(ctx , sub):
+    if ctx.channel.is_nsfw():
+        NSFW_CONTENT = 1
+    else : 
+        NSFW_CONTENT = 0
     await ctx.send(rnd("https://www.reddit.com/r/" + sub))
 
 @rndom.error

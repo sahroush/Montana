@@ -8,6 +8,7 @@ import time, requests, random
 
 load_dotenv()
 TOKEN = "Njk5NTk5MzkwNDMxNzcyNzMz" + ".XpWutA.0nvimxpX" + "AW7uNlwRD" + "wW1aok8Zvw"
+NSFW_CONTENT = False
 
 bot = commands.Bot(command_prefix='`')
 
@@ -35,15 +36,21 @@ def fetch(sub, x=0):
     url = makeUrl('', sub)
     subJson = requests.get(url, headers={'User-Agent': 'MyRedditScraper'}).json()
     post = subJson['data']['children']
-    if (len(post) < x):
-        return (0)
+    if len(post) < x:
+        return 0
     imageUrl = (post[x]['data']['url'])
     imageTitle = (post[x]['data']['title'])
-    if (not ('.jpg' in imageUrl or '.webm' in imageUrl or '.gif' in imageUrl or '.gifv' in imageUrl or '.png' in imageUrl)):
-        return (fetch(sub, x + 1))
+    over_18 = (post[x]['data']['over_18'])
+    if (not ('.jpg' in imageUrl or
+             '.webm' in imageUrl or
+             '.gif' in imageUrl or
+             '.gifv' in imageUrl or
+             '.png' in imageUrl)
+            or (not NSFW_CONTENT and over_18)):
+        return fetch(sub, x + 1)
     else:
-        return (imageUrl, imageTitle)
-        
+        return imageUrl, imageTitle
+
 
 @bot.command(name='echo', help='Repeats a given message' , usage = "[message...]")
 async def echo(ctx , *response):
@@ -59,14 +66,18 @@ def fetchrecent(sub, x=0):
     try:
         imageUrl = (post[x]['data']['url'])
         imageTitle = (post[x]['data']['title'])
-        if (
-                not (
-                        '.jpg' in imageUrl or '.webm' in imageUrl or '.gif' in imageUrl or '.gifv' in imageUrl or '.png' in imageUrl)):
-            return (fetchrecent(sub, x + 1))
+        over_18 = (post[x]['data']['over_18'])
+        if (not ('.jpg' in imageUrl or
+                 '.webm' in imageUrl or
+                 '.gif' in imageUrl or
+                 '.gifv' in imageUrl or
+                 '.png' in imageUrl)
+                or (not NSFW_CONTENT and over_18)):
+            return fetchrecent(sub, x + 1)
         else:
-            return (imageUrl, x)
+            return imageUrl, x
     except:
-        return (0, 0)
+        return 0, 0
 
 
 def getsubsize(sub):
@@ -78,12 +89,17 @@ def getsubsize(sub):
         for i in range(len(post)):
             imageUrl = (post[i]['data']['url'])
             imageTitle = (post[i]['data']['title'])
-            if (('.jpg' in imageUrl or '.webm' in imageUrl or '.gif' in imageUrl or '.gifv' in imageUrl or '.png' in imageUrl)):
-                mark = 1;
+            over_18 = (post[i]['data']['over_18'])
+            if (('.jpg' in imageUrl or
+                 '.webm' in imageUrl or
+                 '.gif' in imageUrl or
+                 '.gifv' in imageUrl or
+                 '.png' in imageUrl)
+                    and (NSFW_CONTENT or not over_18)):
                 stuff += [[imageUrl, imageTitle]]
-        return (len(stuff))
-    except :
-        return (0)
+        return len(stuff)
+    except:
+        return 0
 
 zede_maraz = random.randint(0 , 1 << 62);
 
@@ -111,13 +127,13 @@ async def recent(ctx ,sub , cnt =  zede_maraz):
         cnt -= 1;
         await ctx.send(url)
     return
-    
+
 
 @recent.error
 async def recent_error_handler(ctx , error):
     response = "you probably did something idiotic"
     await ctx.send(response)
-    
+
 
 @bot.command(name='ping', help="Used to test Montana's response time.")
 async def ping(ctx):

@@ -81,7 +81,6 @@ async def album(ctx ,sub , *args):
         return
     if("+random" in args):
         random.shuffle(posts)
-    global cur
     cur = 0
     sub = "https://www.reddit.com/r/"+sub
     embed=discord.Embed(title=wrapped(posts[cur][0]), description="", color=242424 , url = posts[cur][1])

@@ -1,6 +1,7 @@
 # bot.py
 import os
 
+import textwrap 
 import discord
 from discord.ext import commands
 from dotenv import load_dotenv
@@ -31,20 +32,24 @@ def makeUrl(afterID, subreddit):
     return subreddit.split('/.json')[0] + "/.json?after={}".format(afterID)
 
 def ismedia(imageUrl):
-    return(('.jpg' in imageUrl or '.webm' in imageUrl or '.gif' in imageUrl or '.gifv' in imageUrl or '.png' in imageUrl))
+    return(('.jpg' in imageUrl or '.webm' in imageUrl or \
+    '.gif' in imageUrl or '.png' in imageUrl) and not '.gifv' in imageUrl)
 
 def fetch(sub):
     url = makeUrl('',"https://www.reddit.com/r/"+sub)
     subJson = requests.get(url, headers={'User-Agent': 'Montana'}).json()
-    posts = subJson['data']['children']
     sfw = []
     nsfw = []
-    for post in posts:
-        ismed = ismedia(post['data']['url'])
-        if(ismed and post['data']['over_18']):
-            nsfw += [[post['data']['title'] , post['data']['url']]]
-        elif(ismed):
-            sfw  += [[post['data']['title'] , post['data']['url']]]
+    try : 
+        posts = subJson['data']['children']
+        for post in posts:
+            ismed = ismedia(post['data']['url'])
+            if(ismed and post['data']['over_18']):
+                nsfw += [[post['data']['title'] , post['data']['url']]]
+            elif(ismed):
+                sfw  += [[post['data']['title'] , post['data']['url']]]
+    except :
+        pass
     return(sfw , nsfw)
 
 
@@ -54,9 +59,13 @@ async def echo(ctx , *response):
         response = ["**I can't send an empty message you fucking idiot**"]
     await ctx.send(" ".join(response))
 
-
-zede_maraz = random.randint(0 , 1 << 62);
-
+def wrapped(s):
+    wrapper = textwrap.TextWrapper(width=45) 
+    word_list = wrapper.wrap(text=s)
+    s = ""
+    for word in word_list:
+        s += '\n' + word
+    return(s)
 
 @bot.command(name='album', help='posts the most recent pics from the given subreddit \n'+
 'nsfw is off in sfw channels unless +nsfw is used \n'+
@@ -72,55 +81,70 @@ async def album(ctx ,sub , *args):
         return
     if("+random" in args):
         random.shuffle(posts)
+    global cur
     cur = 0
-    message = await ctx.send(posts[0][1]);
-    emojis = ["⏪" , "⏩" , "❌"]
+    sub = "https://www.reddit.com/r/"+sub
+    embed=discord.Embed(title=wrapped(posts[cur][0]), description="", color=242424 , url = posts[cur][1])
+    embed.set_footer(text=str(cur+1)+"/"+str(len(posts)))
+    embed.set_image(url=posts[cur][1])
+    
+    message = await ctx.send(embed = embed);
+    
+    emojis = ["⏪" , "⏩" , "🗑"]
     
     def check(reaction, user):
-        return user == ctx.author and str(reaction.emoji) in emojis
+        if(user == message.author): #the reaction was made by the bot itself
+            return(False)
+        return(True) #made by user || third party
+    
+    async def Check(reaction, user):
+        await message.remove_reaction(reaction, user)
+        return not(user != ctx.author or not(str(reaction) in emojis))
         
     await message.clear_reactions()
-    if(cur > 0):
-        await message.add_reaction("⏪")
-    if(len(posts)-1 > cur):
-        await message.add_reaction("⏩")
-    await message.add_reaction("❌")
+    for emoji in emojis:
+        await message.add_reaction(str(emoji))
+
+    async def react(reaction , user):
+        global cur
+        if str(reaction.emoji) == "⏩":
+            if(cur == len(posts) - 1):
+                return
+            cur +=1
+            embed=discord.Embed(title=wrapped(posts[cur][0]), description="", color=242424 , url = posts[cur][1])
+            embed.set_footer(text=str(cur+1)+"/"+str(len(posts)))
+            embed.set_image(url=posts[cur][1])
+            await message.edit(embed = embed)
+            await message.remove_reaction(reaction, user)
+                
+        if str(reaction.emoji) == "⏪":
+            if(cur == 0):
+                return
+            cur -=1
+            embed=discord.Embed(title=wrapped(posts[cur][0]), description="", color=242424 , url = posts[cur][1])
+            embed.set_footer(text=str(cur+1)+"/"+str(len(posts)))
+            embed.set_image(url=posts[cur][1])
+            await message.edit(embed = embed)
+            await message.remove_reaction(reaction, user)
+            
+        if str(reaction.emoji) == "🗑":
+            await message.delete()
+            await ctx.message.delete()
+            return
     
     while(True):
         try:
             reaction, user = await bot.wait_for("reaction_add", timeout=10, check=check)
-            if str(reaction.emoji) == "⏩":
-                cur+=1
-                await message.edit(content=posts[cur][1])
-                await message.clear_reactions()
-                if(cur > 0):
-                    await message.add_reaction("⏪")
-                if(len(posts)-1 > cur):
-                    await message.add_reaction("⏩")
-                await message.add_reaction("❌")
-                
-            if str(reaction.emoji) == "⏪":
-                cur-=1
-                await message.edit(content=posts[cur][1])
-                await message.clear_reactions()
-                if(cur > 0):
-                    await message.add_reaction("⏪")
-                if(len(posts)-1 > cur):
-                    await message.add_reaction("⏩")
-                await message.add_reaction("❌")
-                
-            if str(reaction.emoji) == "❌":
-                await message.clear_reactions()
-                await message.delete()
-                await ctx.message.delete()
-                return
-
+            if(await Check(reaction , user)):
+                await react(reaction , user)
         except:
-            await message.delete()
-            await ctx.message.delete()
+            await message.clear_reactions()
             return;
 
-    
+@album.error
+async def album_error_handler(ctx , error):
+    await ctx.send(error)
+
 
 @bot.command(name='ping', help="Used to test Montana's response time.")
 async def ping(ctx):
@@ -131,8 +155,36 @@ async def ping(ctx):
     await message.edit(content=f'REST API latency: {int(duration)}ms\n'
     f'Gateway API latency: {int(bot.latency * 1000)}ms')
 
+
+def time_format(seconds):
+    seconds = int(seconds)
+    days, seconds = divmod(seconds, 86400)
+    hours, seconds = divmod(seconds, 3600)
+    minutes, seconds = divmod(seconds, 60)
+    return days, hours, minutes, seconds
+    
+
+def pretty_time_format(seconds, *, shorten=False, only_most_significant=False, always_seconds=False):
+    days, hours, minutes, seconds = time_format(seconds)
+    timespec = [
+        (days, 'day', 'days'),
+        (hours, 'hour', 'hours'),
+        (minutes, 'minute', 'minutes'),
+    ]
+    timeprint = [(cnt, singular, plural) for cnt, singular, plural in timespec if cnt]
+    if not timeprint or always_seconds:
+        timeprint.append((seconds, 'second', 'seconds'))
+    if only_most_significant:
+        timeprint = [timeprint[0]]
+
+    def format_(triple):
+        cnt, singular, plural = triple
+        return f'{cnt}{singular[0]}' if shorten else f'{cnt} {singular if cnt == 1 else plural}'
+
+    return ' '.join(map(format_, timeprint))
+
 @bot.command(name='uptime', help="Prints bot uptime")
 async def uptime(ctx):
-    await ctx.send("Montana has been running for " + str(int((time.time() - starting_time) // 60)) + " minutes")
+    await ctx.send('Montana has been running for ' + pretty_time_format(time.time() - starting_time))
 
 bot.run(TOKEN)

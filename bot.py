@@ -42,7 +42,7 @@ def ismedia(imageUrl):
             '.png' in imageUrl) and not '.gifv' in imageUrl
 
 
-def fetch(sixdigit):
+def fetchn(sixdigit):
     douj = nh.Doujinshi(sixdigit)
     links = []
     for i in range(douj.pages):
@@ -69,7 +69,7 @@ def wrapped(s):
                                 'nsfw is off in sfw channels unless +nsfw is used \n'
                                 , usage="<sixdigitreddit> [+nsfw][+random]")
 async def nhentai(ctx, sixdigit = 0 , *args):
-    posts, name = fetch(sixdigit)
+    posts, name = fetchn(sixdigit)
     if ctx.channel.type is discord.ChannelType.private:
         response = "Sorry, this command is not available in DMs :sob:"
         await ctx.send(response)

@@ -3,14 +3,15 @@
 import random
 import textwrap
 import time
+import os
 
 import discord
 import requests
 from discord.ext import commands
-from dotenv import load_dotenv
 
-load_dotenv()
-TOKEN = "Njk5NTk5MzkwNDMxNzcyNzMz" + ".XpWutA.0nvimxpX" + "AW7uNlwRD" + "wW1aok8Zvw"
+TOKEN = os.getenv("TOKEN")
+if not TOKEN:
+    TOKEN = "Njk5NTk5MzkwNDMxNzcyNzMz" + ".XpWutA.0nvimxpX" + "AW7uNlwRD" + "wW1aok8Zvw"    # The most idiotic idea
 
 bot = commands.Bot(command_prefix='`')
 

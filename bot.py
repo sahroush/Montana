@@ -65,9 +65,111 @@ def wrapped(s):
     return s
 
 
+def fetch(sub):
+    url = makeUrl('', "https://www.reddit.com/r/" + sub)
+    subJson = requests.get(url, headers={'User-Agent': 'Montana'}).json()
+    sfw = []
+    nsfw = []
+    try:
+        posts = subJson['data']['children']
+        for post in posts:
+            ismed = ismedia(post['data']['url'])
+            if ismed and post['data']['over_18']:
+                nsfw += [[post['data']['title'], post['data']['url']]]
+            elif ismed:
+                sfw += [[post['data']['title'], post['data']['url']]]
+    except:
+        pass
+    return sfw, nsfw
+    
+    
+@bot.command(name='album', help='posts the most recent pics from the given subreddit \n' +
+                                'nsfw is off in sfw channels unless +nsfw is used \n' +
+                                'shuffles posts when +random is used ', usage="<subreddit> [+nsfw][+random]")
+async def album(ctx, sub, *args):
+    sfw, nsfw = fetch(sub)
+    posts = sfw
+    if ctx.channel.type is discord.ChannelType.private:
+        response = "Sorry, this command is not available in DMs :sob:"
+        await ctx.send(response)
+        return
+    if "+nsfw" in args or ctx.channel.is_nsfw():
+        posts += nsfw
+    if not posts:
+        response = "Sorry, couldn't find a pic :sob:"
+        await ctx.send(response)
+        return
+    if "+random" in args:
+        random.shuffle(posts)
+    cur = 0
+    sub = "https://www.reddit.com/r/" + sub
+    embed = discord.Embed(title=wrapped(posts[cur][0]), description="", color=242424, url=posts[cur][1])
+    embed.set_footer(text=str(cur + 1) + "/" + str(len(posts)))
+    embed.set_image(url=posts[cur][1])
+
+    message = await ctx.send(embed=embed)
+
+    emojis = ["⏪", "⏩", "🗑"]
+
+    def check(reaction, user):
+        if user == message.author or reaction.message.id != message.id:  # the reaction was made by the bot itself
+            return False
+        return True  # made by user || third party
+
+    async def Check(reaction, user):
+        await message.remove_reaction(reaction, user)
+        return not (user != ctx.author or not (str(reaction) in emojis))
+
+    await message.clear_reactions()
+    for emoji in emojis:
+        await message.add_reaction(str(emoji))
+
+    async def react(reaction, user):
+        nonlocal cur
+        if str(reaction.emoji) == "⏩":
+            if cur == len(posts) - 1:
+                return False
+            cur += 1
+            embed = discord.Embed(title=wrapped(posts[cur][0]), description="", color=242424, url=posts[cur][1])
+            embed.set_footer(text=str(cur + 1) + "/" + str(len(posts)))
+            embed.set_image(url=posts[cur][1])
+            await message.edit(embed=embed)
+            await message.remove_reaction(reaction, user)
+
+        if str(reaction.emoji) == "⏪":
+            if cur == 0:
+                return False
+            cur -= 1
+            embed = discord.Embed(title=wrapped(posts[cur][0]), description="", color=242424, url=posts[cur][1])
+            embed.set_footer(text=str(cur + 1) + "/" + str(len(posts)))
+            embed.set_image(url=posts[cur][1])
+            await message.edit(embed=embed)
+            await message.remove_reaction(reaction, user)
+
+        if str(reaction.emoji) == "🗑":
+            await message.delete()
+            await ctx.message.delete()
+            return True
+
+    while True:
+        try:
+            reaction, user = await bot.wait_for("reaction_add", timeout=120, check=check)
+            if await Check(reaction, user):
+                if await react(reaction, user):
+                    break
+        except:
+            await message.clear_reactions()
+            break
+
+
+@album.error
+async def album_error_handler(ctx, error):
+    await ctx.send(error)
+
+
 @bot.command(name='nhentai', help='posts the given sauce \n' +
                                 'nsfw is off in sfw channels unless +nsfw is used \n'
-                                , usage="<sixdigitreddit> [+nsfw][+random]")
+                                , usage="<sixdigitreddit> [+nsfw]")
 async def nhentai(ctx, sixdigit = 0 , *args):
     posts, name = fetchn(sixdigit)
     if ctx.channel.type is discord.ChannelType.private:

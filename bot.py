@@ -101,7 +101,7 @@ async def album(ctx, sub, *args):
     emojis = ["⏪", "⏩", "🗑"]
 
     def check(reaction, user):
-        if user == message.author:  # the reaction was made by the bot itself
+        if user == message.author or reaction.message.id != message.id:  # the reaction was made by the bot itself
             return False
         return True  # made by user || third party
 

@@ -21,7 +21,7 @@ starting_time = time.time()
 @bot.event
 async def on_ready():
     starting_time = time.time()
-    await bot.change_presence(activity=discord.Game(name="with my balls"))
+    await bot.change_presence(activity=discord.Game(name="Use `help!"))
     print(f'{bot.user.name} has connected to Discord!')
 
 

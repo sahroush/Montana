@@ -65,7 +65,7 @@ def wrapped(s):
     return s
 
 
-@bot.command(name='nhentai', help='posts the given hentai \n' +
+@bot.command(name='nhentai', help='posts the given sauce \n' +
                                 'nsfw is off in sfw channels unless +nsfw is used \n'
                                 , usage="<sixdigitreddit> [+nsfw][+random]")
 async def nhentai(ctx, sixdigit = 0 , *args):

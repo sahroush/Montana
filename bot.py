@@ -82,7 +82,10 @@ def wrapped(s):
 async def album(ctx, sub, *args):
     sfw, nsfw = fetch(sub)
     posts = sfw
-    if ctx.channel.type is discord.ChannelType.private or "+nsfw" in args or ctx.channel.is_nsfw():
+    if ctx.channel.type is discord.ChannelType.private:
+        response = "Sorry, this command is not available in DMs :sob:"
+        await ctx.send(response)
+    if "+nsfw" in args or ctx.channel.is_nsfw():
         posts += nsfw
     if not posts:
         response = "Sorry, couldn't find a pic :sob:"

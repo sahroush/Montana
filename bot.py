@@ -114,7 +114,7 @@ async def album(ctx, sub, *args):
         await message.add_reaction(str(emoji))
 
     async def react(reaction, user):
-        global cur
+        nonlocal cur
         if str(reaction.emoji) == "⏩":
             if cur == len(posts) - 1:
                 return

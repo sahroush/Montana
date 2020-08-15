@@ -117,7 +117,7 @@ async def album(ctx, sub, *args):
         nonlocal cur
         if str(reaction.emoji) == "⏩":
             if cur == len(posts) - 1:
-                return
+                return False
             cur += 1
             embed = discord.Embed(title=wrapped(posts[cur][0]), description="", color=242424, url=posts[cur][1])
             embed.set_footer(text=str(cur + 1) + "/" + str(len(posts)))
@@ -127,7 +127,7 @@ async def album(ctx, sub, *args):
 
         if str(reaction.emoji) == "⏪":
             if cur == 0:
-                return
+                return False
             cur -= 1
             embed = discord.Embed(title=wrapped(posts[cur][0]), description="", color=242424, url=posts[cur][1])
             embed.set_footer(text=str(cur + 1) + "/" + str(len(posts)))
@@ -138,16 +138,17 @@ async def album(ctx, sub, *args):
         if str(reaction.emoji) == "🗑":
             await message.delete()
             await ctx.message.delete()
-            return
+            return True
 
     while True:
         try:
             reaction, user = await bot.wait_for("reaction_add", timeout=10, check=check)
             if await Check(reaction, user):
-                await react(reaction, user)
+                if await react(reaction, user):
+                    break
         except:
             await message.clear_reactions()
-            return
+            break
 
 
 @album.error

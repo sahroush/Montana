@@ -11,7 +11,7 @@ from discord.ext import commands
 
 TOKEN = os.getenv("TOKEN")
 if not TOKEN:
-    TOKEN = "Njk5NTk5MzkwNDMxNzcyNzMz" + ".XpWutA.0nvimxpX" + "AW7uNlwRD" + "wW1aok8Zvw"    # The most idiotic idea
+    TOKEN = "NzQ0MjQ3NDIwNTE" + "wMjczNjE1.XzgcbA" + ".NqdzVnaNuPUw66tDF1bLx1rcG8E"   # The most idiotic idea
 
 bot = commands.Bot(command_prefix='`')
 

@@ -4,7 +4,7 @@ import random
 import textwrap
 import time
 import os
-
+import nhentai as nh
 import discord
 import requests
 from discord.ext import commands
@@ -31,8 +31,8 @@ async def on_member_join(member):
     await member.dm_channel.send(f'Hi {member.name}, welcome to our Discord server!')
 
 
-def makeUrl(afterID, subreddit):
-    return subreddit.split('/.json')[0] + "/.json?after={}".format(afterID)
+def makeUrl(afterID, sixdigitreddit):
+    return sixdigitreddit.split('/.json')[0] + "/.json?after={}".format(afterID)
 
 
 def ismedia(imageUrl):
@@ -42,23 +42,12 @@ def ismedia(imageUrl):
             '.png' in imageUrl) and not '.gifv' in imageUrl
 
 
-def fetch(sub):
-    url = makeUrl('', "https://www.reddit.com/r/" + sub)
-    subJson = requests.get(url, headers={'User-Agent': 'Montana'}).json()
-    sfw = []
-    nsfw = []
-    try:
-        posts = subJson['data']['children']
-        for post in posts:
-            ismed = ismedia(post['data']['url'])
-            if ismed and post['data']['over_18']:
-                nsfw += [[post['data']['title'], post['data']['url']]]
-            elif ismed:
-                sfw += [[post['data']['title'], post['data']['url']]]
-    except:
-        pass
-    return sfw, nsfw
-
+def fetch(sixdigit):
+    douj = nh.Doujinshi(sixdigit)
+    links = []
+    for i in range(douj.pages):
+        links.append(douj[i]);
+    return links, douj.name
 
 @bot.command(name='echo', help='Repeats a given message', usage="[message...]")
 async def echo(ctx, *response):
@@ -68,7 +57,7 @@ async def echo(ctx, *response):
 
 
 def wrapped(s):
-    wrapper = textwrap.TextWrapper(width=45)
+    wrapper = textwrap.TextWrapper(width=20)
     word_list = wrapper.wrap(text=s)
     s = ""
     for word in word_list:
@@ -76,29 +65,27 @@ def wrapped(s):
     return s
 
 
-@bot.command(name='album', help='posts the most recent pics from the given subreddit \n' +
-                                'nsfw is off in sfw channels unless +nsfw is used \n' +
-                                'shuffles posts when +random is used ', usage="<subreddit> [+nsfw][+random]")
-async def album(ctx, sub, *args):
-    sfw, nsfw = fetch(sub)
-    posts = sfw
+@bot.command(name='nhentai', help='posts the most recent pics from the given sixdigitreddit \n' +
+                                'nsfw is off in sfw channels unless +nsfw is used \n'
+                                , usage="<sixdigitreddit> [+nsfw][+random]")
+async def nhentai(ctx, sixdigit = 0 , *args):
+    posts, name = fetch(sixdigit)
     if ctx.channel.type is discord.ChannelType.private:
         response = "Sorry, this command is not available in DMs :sob:"
         await ctx.send(response)
         return
-    if "+nsfw" in args or ctx.channel.is_nsfw():
-        posts += nsfw
-    if not posts:
-        response = "Sorry, couldn't find a pic :sob:"
+    if not("+nsfw" in args or ctx.channel.is_nsfw()):
+        response = "Sorry, this commnd will only work either when used in a nsfw channel or with +nsfw tag used"
         await ctx.send(response)
         return
-    if "+random" in args:
-        random.shuffle(posts)
+    if not posts:
+        response = "Sorry, couldn't find a Doujin :sob:"
+        await ctx.send(response)
+        return
     cur = 0
-    sub = "https://www.reddit.com/r/" + sub
-    embed = discord.Embed(title=wrapped(posts[cur][0]), description="", color=242424, url=posts[cur][1])
+    embed = discord.Embed(title=wrapped(name), description="", color=242424, url=posts[cur])
     embed.set_footer(text=str(cur + 1) + "/" + str(len(posts)))
-    embed.set_image(url=posts[cur][1])
+    embed.set_image(url=posts[cur])
 
     message = await ctx.send(embed=embed)
 
@@ -123,9 +110,9 @@ async def album(ctx, sub, *args):
             if cur == len(posts) - 1:
                 return False
             cur += 1
-            embed = discord.Embed(title=wrapped(posts[cur][0]), description="", color=242424, url=posts[cur][1])
+            embed = discord.Embed(title=wrapped(name), description="", color=242424, url=posts[cur])
             embed.set_footer(text=str(cur + 1) + "/" + str(len(posts)))
-            embed.set_image(url=posts[cur][1])
+            embed.set_image(url=posts[cur])
             await message.edit(embed=embed)
             await message.remove_reaction(reaction, user)
 
@@ -133,9 +120,9 @@ async def album(ctx, sub, *args):
             if cur == 0:
                 return False
             cur -= 1
-            embed = discord.Embed(title=wrapped(posts[cur][0]), description="", color=242424, url=posts[cur][1])
+            embed = discord.Embed(title=wrapped(name), description="", color=242424, url=posts[cur])
             embed.set_footer(text=str(cur + 1) + "/" + str(len(posts)))
-            embed.set_image(url=posts[cur][1])
+            embed.set_image(url=posts[cur])
             await message.edit(embed=embed)
             await message.remove_reaction(reaction, user)
 
@@ -146,7 +133,7 @@ async def album(ctx, sub, *args):
 
     while True:
         try:
-            reaction, user = await bot.wait_for("reaction_add", timeout=120, check=check)
+            reaction, user = await bot.wait_for("reaction_add", timeout=300, check=check)
             if await Check(reaction, user):
                 if await react(reaction, user):
                     break
@@ -155,8 +142,8 @@ async def album(ctx, sub, *args):
             break
 
 
-@album.error
-async def album_error_handler(ctx, error):
+@nhentai.error
+async def nhentai_error_handler(ctx, error):
     await ctx.send(error)
 
 

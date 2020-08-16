@@ -89,12 +89,12 @@ async def pagify(bot , ctx , links , names):
 
     while True:
         try:
-            reaction, user = await bot.wait_for("reaction_add", timeout=10, check=check)
+            reaction, user = await bot.wait_for("reaction_add", timeout=180, check=check)
             if await Check(reaction, user):
                 if await react(reaction, user):
                     break
         except asyncio.TimeoutError:
+            await message.clear_reactions()
             break
         except:
-            await message.clear_reactions()
             break

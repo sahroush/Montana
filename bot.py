@@ -107,8 +107,10 @@ async def uptime(ctx):
 async def dokme(ctx, condition):
     if condition == 'off':
         await bot.change_presence(status=discord.Status.online)
+        await ctx.send(embed=make_embed("I am online nowٔ"))
     elif condition == 'on':
         await bot.change_presence(status=discord.Status.invisible)
+        await ctx.send(embed=make_embed("Pushed dokme successfully"))
     else:
         raise Exception("What should I do?")
 

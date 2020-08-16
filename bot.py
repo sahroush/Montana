@@ -14,6 +14,7 @@ if not TOKEN:
     TOKEN = "Njk5NTk5MzkwNDMxNzcyNzMz" + ".XpWutA.0nvimxpX" + "AW7uNlwRD" + "wW1aok8Zvw"    # The most idiotic idea
 
 bot = commands.Bot(command_prefix='`')
+PREFIX = '`'
 
 starting_time = time.time()
 
@@ -21,7 +22,7 @@ starting_time = time.time()
 @bot.event
 async def on_ready():
     starting_time = time.time()
-    await bot.change_presence(activity=discord.Game(name="Use `help!"))
+    await bot.change_presence(activity=discord.Game(name="Use "+PREFIX+"help!"))
     print(f'{bot.user.name} has connected to Discord!')
 
 
@@ -32,12 +33,19 @@ async def on_member_join(member):
 
 
 
-@bot.command(name='echo', help='Repeats a given message', usage="[message...]")
+@bot.command(name='echo', help='Repeats a given message', usage="<message>")
 async def echo(ctx, *response):
     if not response:
         response = ["**I can't send an empty message you fucking idiot**"]
     await ctx.send(" ".join(response))
 
+
+@bot.command(name='setprefix', help="Changes bot's prefix", usage="<prefix>")
+async def setprefix(ctx, prefix):
+    PREFIX = prefix
+    bot = commands.Bot(command_prefix=prefix)
+    await ctx.send("Prefix changed to "+prefix)
+    await bot.change_presence(activity=discord.Game(name="Use "+PREFIX+"help!"))
 
     
 @bot.command(name='album', help='posts the most recent pics from the given subreddit \n' +
@@ -106,7 +114,7 @@ async def uptime(ctx):
 @commands.has_role('Admin')
 async def dokme(ctx, condition):
     if condition == 'off':
-        await bot.change_presence(status=discord.Status.online, activity=discord.Game(name="Use `help!"))
+        await bot.change_presence(status=discord.Status.online, activity=discord.Game(name="Use "+PREFIX+"help!"))
         await ctx.send(embed=make_embed("I am online now"))
     elif condition == 'on':
         await bot.change_presence(status=discord.Status.invisible)

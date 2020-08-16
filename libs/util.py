@@ -22,7 +22,7 @@ def wrapped(s):
     return s
 
 
-def setprefix(prefix):
+def changeprefix(prefix):
     file = open("bot.py", "r+")
     content = file.readlines()
     content[0] = "#" + prefix + '\n'

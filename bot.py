@@ -105,9 +105,9 @@ async def uptime(ctx):
 @bot.command(name='dokme', help="on or off", usage="<condition>")
 @commands.has_role('Admin')
 async def dokme(ctx, condition):
-    if condition == 'on':
+    if condition == 'off':
         await bot.change_presence(status=discord.Status.online)
-    elif condition == 'off':
+    elif condition == 'on':
         await bot.change_presence(status=discord.Status.invisible)
     else:
         raise Exception("What should I do?")

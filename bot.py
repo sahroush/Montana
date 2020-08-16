@@ -5,6 +5,7 @@ import time
 import os
 import discord
 from discord.ext import commands
+from discord.ext.commands import CommandNotFound
 from libs.reddit import *
 from libs.util import *
 from libs.nhentai import *
@@ -117,6 +118,8 @@ async def dokme(ctx, condition):
 
 @bot.event
 async def on_command_error(ctx, error):
+    if isinstance(error, CommandNotFound):
+        return
     await ctx.send(embed=make_embed(error))
  
     

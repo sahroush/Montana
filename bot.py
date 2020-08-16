@@ -1,4 +1,4 @@
-# bot.py
+#`
 
 import random
 import time
@@ -13,8 +13,10 @@ TOKEN = os.getenv("TOKEN")
 if not TOKEN:
     TOKEN = "Njk5NTk5MzkwNDMxNzcyNzMz" + ".XpWutA.0nvimxpX" + "AW7uNlwRD" + "wW1aok8Zvw"    # The most idiotic idea
 
-bot = commands.Bot(command_prefix='`')
-PREFIX = '`'
+PREFIX = getprefix()
+
+bot = commands.Bot(command_prefix=PREFIX)
+
 
 starting_time = time.time()
 
@@ -40,12 +42,15 @@ async def echo(ctx, *response):
     await ctx.send(" ".join(response))
 
 
-@bot.command(name='setprefix', help="Changes bot's prefix", usage="<prefix>")
+@bot.command(name='setprefix', help="Changes bot's prefix (needs restart) \n Warning : DO NOT USE FREQUENTLY", usage="<prefix>")
 async def setprefix(ctx, prefix):
     PREFIX = prefix
     bot = commands.Bot(command_prefix=prefix)
     await ctx.send("Prefix changed to "+prefix)
     await bot.change_presence(activity=discord.Game(name="Use "+PREFIX+"help!"))
+    changeprefix(prefix)
+    await ctx.send("Restarting....")
+    exit() # based on the fact that heroku instantly restarts codes that do not crash often
 
     
 @bot.command(name='album', help='posts the most recent pics from the given subreddit \n' +

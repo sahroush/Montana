@@ -10,6 +10,7 @@ colors = [ 0, 1752220, 3066993, 3447003, 10181046, 15844367, 15105570, 15158332,
 def getprefix():
     file = open("bot.py" , "r+")
     prefix = ((file.readline())[ 1 : -1 ])
+    file.close()
     return(prefix)
 
 def wrapped(s):
@@ -19,6 +20,18 @@ def wrapped(s):
     for word in word_list:
         s += '\n' + word
     return s
+
+
+def setprefix(prefix):
+    file = open("bot.py", "r+")
+    content = file.readlines()
+    content[0] = "#" + prefix + '\n'
+    file.close()
+    file = open("bot.py", "w+")
+    for i in content :
+        file.write(i)
+    file.close()
+
     
 def time_format(seconds):
     seconds = int(seconds)

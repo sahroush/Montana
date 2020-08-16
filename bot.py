@@ -66,14 +66,9 @@ async def album(ctx, sub, *args):
     await pagify(bot , ctx , links , names)
 
 
-@album.error
-async def album_error_handler(ctx, error):
-    await ctx.send(error)
-
-
 @bot.command(name='nhentai', help='posts the given sauce \n' +
                                 'nsfw is off in sfw channels unless +nsfw is used \n'
-                                , usage="<sixdigitreddit> [+nsfw]")
+                                , usage="<source number> [+nsfw]")
 async def nhentai(ctx, sixdigit:int , *args):
     posts, name = fetch_hentai(sixdigit)
     if ctx.channel.type is discord.ChannelType.private:
@@ -91,10 +86,6 @@ async def nhentai(ctx, sixdigit:int , *args):
     names = [name]*len(posts)
     await pagify(bot , ctx , posts , names)
 
-@nhentai.error
-async def nhentai_error_handler(ctx, error):
-    await ctx.send(error)
-
 
 @bot.command(name='ping', help="Used to test Montana's response time.")
 async def ping(ctx):
@@ -106,12 +97,13 @@ async def ping(ctx):
     f'Gateway API latency: {int(bot.latency * 1000)}ms')
 
 
-
-
-
 @bot.command(name='uptime', help="Prints bot uptime")
 async def uptime(ctx):
     await ctx.send('Montana has been running for ' + pretty_time_format(time.time() - starting_time))
 
-
+@bot.event
+async def on_command_error(ctx, error):
+    await ctx.send(error)
+ 
+    
 bot.run(TOKEN)

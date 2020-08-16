@@ -102,7 +102,7 @@ async def uptime(ctx):
     await ctx.send('Montana has been running for ' + pretty_time_format(time.time() - starting_time))
 
 
-@bot.command(name='dokme', help="on or off", usage="<condition>")
+@bot.command(help="on or off", usage="<condition>" , aliases=['dokme', 'lurk'])
 @commands.has_role('Admin')
 async def dokme(ctx, condition):
     if condition == 'off':

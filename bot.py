@@ -106,7 +106,7 @@ async def uptime(ctx):
 @commands.has_role('Admin')
 async def dokme(ctx, condition):
     if condition == 'off':
-        await bot.change_presence(status=discord.Status.online)
+        await bot.change_presence(status=discord.Status.online , activity=discord.Game(name="Use `help!"))
         await ctx.send(embed=make_embed("I am online nowٔ"))
     elif condition == 'on':
         await bot.change_presence(status=discord.Status.invisible)

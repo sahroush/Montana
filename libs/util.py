@@ -92,6 +92,8 @@ async def pagify(bot , ctx , links , names):
             if await Check(reaction, user):
                 if await react(reaction, user):
                     break
+        except TimeoutError:
+            break
         except:
             await message.clear_reactions()
             break

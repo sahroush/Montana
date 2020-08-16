@@ -74,7 +74,7 @@ async def album_error_handler(ctx, error):
 @bot.command(name='nhentai', help='posts the given sauce \n' +
                                 'nsfw is off in sfw channels unless +nsfw is used \n'
                                 , usage="<sixdigitreddit> [+nsfw]")
-async def nhentai(ctx, sixdigit = 0 , *args):
+async def nhentai(ctx, sixdigit:int , *args):
     posts, name = fetch_hentai(sixdigit)
     if ctx.channel.type is discord.ChannelType.private:
         response = "Sorry, this command is not available in DMs :sob:"

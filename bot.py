@@ -43,6 +43,7 @@ async def echo(ctx, *response):
 
 
 @bot.command(name='setprefix', help="Changes bot's prefix (needs restart) \n Warning : DO NOT USE FREQUENTLY", usage="<prefix>")
+@commands.has_role('Admin')
 async def setprefix(ctx, prefix):
     PREFIX = prefix
     bot = commands.Bot(command_prefix=prefix)

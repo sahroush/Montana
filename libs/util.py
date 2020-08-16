@@ -1,5 +1,6 @@
 import textwrap
 import discord
+import asyncio
 
 def wrapped(s):
     wrapper = textwrap.TextWrapper(width=20)
@@ -88,11 +89,11 @@ async def pagify(bot , ctx , links , names):
 
     while True:
         try:
-            reaction, user = await bot.wait_for("reaction_add", timeout=180, check=check)
+            reaction, user = await bot.wait_for("reaction_add", timeout=10, check=check)
             if await Check(reaction, user):
                 if await react(reaction, user):
                     break
-        except TimeoutError:
+        except asyncio.TimeoutError:
             break
         except:
             await message.clear_reactions()

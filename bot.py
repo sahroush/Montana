@@ -46,7 +46,6 @@ async def echo(ctx, *response):
 @commands.has_role('Admin')
 async def setprefix(ctx, prefix):
     PREFIX = prefix
-    bot = commands.Bot(command_prefix=prefix)
     await ctx.send("Prefix changed to "+prefix)
     await bot.change_presence(activity=discord.Game(name="Use "+PREFIX+"help!"))
     changeprefix(prefix)

@@ -101,6 +101,18 @@ async def ping(ctx):
 async def uptime(ctx):
     await ctx.send('Montana has been running for ' + pretty_time_format(time.time() - starting_time))
 
+
+@bot.command(name='dokme', help="on or off", usage="<condition>")
+@commands.has_role('Admin')
+async def dokme(ctx, condition):
+    if condition == 'on':
+        await bot.change_presence(status=discord.Status.online)
+    elif condition == 'off':
+        await bot.change_presence(status=discord.Status.invisible)
+    else:
+        raise Exception("What should I do?")
+
+
 @bot.event
 async def on_command_error(ctx, error):
     await ctx.send(embed = make_embed(error))

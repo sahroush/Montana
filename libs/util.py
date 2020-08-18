@@ -3,7 +3,7 @@ import discord
 import asyncio
 import random
 
-colors = [ 0, 1752220, 3066993, 3447003, 10181046, 15844367, 15105570, 15158332,
+colors = [0, 1752220, 3066993, 3447003, 10181046, 15844367, 15105570, 15158332,
           9807270, 8359053, 3426654, 1146986, 2067276, 2123412, 7419530, 12745742,
           11027200, 10038562, 9936031, 12370112, 2899536, 16580705, 12320855]
 
@@ -15,7 +15,8 @@ def wrapped(s):
     for word in word_list:
         s += '\n' + word
     return s
-    
+
+
 def time_format(seconds):
     seconds = int(seconds)
     days, seconds = divmod(seconds, 86400)
@@ -45,12 +46,13 @@ def pretty_time_format(seconds, *, shorten=False, only_most_significant=False, a
 
 
 def make_embed(text):
-    return discord.Embed(description= str(text), color=colors [random.randint( 0 , len(colors) - 1)])
+    return discord.Embed(description=str(text), color=colors[random.randint(0, len(colors) - 1)])
 
 
-async def pagify(bot , ctx , links , names):
+async def pagify(bot, ctx, links, names):
     cur = 0
-    embed = discord.Embed(title=wrapped(names[cur]), description="", color=colors [random.randint( 0 , len(colors) - 1)] , url=links[cur])
+    embed = discord.Embed(title=wrapped(names[cur]), description="", color=colors[random.randint(0, len(colors) - 1)],
+                          url=links[cur])
     embed.set_footer(text=str(cur + 1) + "/" + str(len(links)))
     embed.set_image(url=links[cur])
 

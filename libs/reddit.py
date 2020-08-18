@@ -1,12 +1,16 @@
 import requests
+
+
 def makeUrl(afterID, sub):
     return sub.split('/.json')[0] + "/.json?after={}".format(afterID)
- 
+
+
 def ismedia(imageUrl):
     return ('.jpg' in imageUrl or
             '.webm' in imageUrl or
             '.gif' in imageUrl or
-            '.png' in imageUrl) and not '.gifv' in imageUrl
+            '.png' in imageUrl) and '.gifv' not in imageUrl
+
 
 def fetch(sub):
     url = makeUrl('', "https://www.reddit.com/r/" + sub)

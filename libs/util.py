@@ -123,15 +123,16 @@ async def send_pdf(ctx, name , links):
     loading = await ctx.send(file=discord.File('libs/files/loading.gif'))
     images = []
     for link in links:
-            img = Image.open(requests.get(link, stream=True).raw).convert('RGB')
-            if img.size[0] * img.size[1] <  1000000:
-                images += [img]
-            if(len(images) > 0):
-                images[0].save(name + '.pdf' ,save_all=True, append_images=images[1:])
-                if(os.stat(name + '.pdf').st_size > 6900000):
-                    await ctx.send(file=discord.File(name + '.pdf'))
-                    images = []
-                    os.remove(name+".pdf")
+            response = requests.head(link, allow_redirects=True)
+            size = response.headers.get('content-length', -1)
+            if(size < 3900000):
+                images += [Image.open(requests.get(link, stream=True).raw).convert('RGB')]
+                if(len(images) > 0):
+                    images[0].save(name + '.pdf' ,save_all=True, append_images=images[1:])
+                    if(os.stat(name + '.pdf').st_size > 6900000):
+                        await ctx.send(file=discord.File(name + '.pdf'))
+                        images = []
+                        os.remove(name+".pdf")
     if(len(images) > 0):
         images[0].save(name + '.pdf' ,save_all=True, append_images=images[1:])
         await ctx.send(file=discord.File(name + '.pdf'))

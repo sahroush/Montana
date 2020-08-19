@@ -13,7 +13,7 @@ def ismedia(imageUrl , pdf):
     if(pdf):
         response = requests.head(imageUrl, allow_redirects=True)
         size = int(response.headers.get('content-length', -1))
-        if(size > size < 2250000):
+        if(size > 2250000):
             ismed = 0
     return(ismed)
 

@@ -118,11 +118,18 @@ async def pagify(bot, ctx, links, names):
             break
 
 
+cnt = 0;
+
+
 async def send_pdf(ctx, name , links):
     name += str(random.randint(0 , 1000000000))
     loading = await ctx.send(file=discord.File('libs/files/loading.gif'))
     images = []
     size_sum = 0;
+    global cnt
+    while(cnt >= 2):
+        asyncio.sleep(2)
+    cnt+=1
     for link in links:
             response = requests.head(link, allow_redirects=True)
             size = int(response.headers.get('content-length', -1))
@@ -145,3 +152,4 @@ async def send_pdf(ctx, name , links):
         images = []
         os.remove(name+".pdf")
     await loading.delete()
+    cnt -= 1

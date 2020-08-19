@@ -42,7 +42,7 @@ async def echo(ctx, *response):
                                 'shuffles posts when +random is used ' +
                                 'sends a pdf instead of an album when +pdf is used', usage="<subreddit> [+nsfw][+random][+pdf]")
 async def album(ctx, sub, *args):
-    sfw, nsfw = fetch(sub , not "+pdf" in args) # pdf ==> no gifs
+    sfw, nsfw = fetch(sub , "+pdf" in args) # pdf ==> no gifs
     posts = sfw
     if ctx.channel.type is discord.ChannelType.private:
         response = "Sorry, this command is not available in DMs :sob:"
@@ -71,7 +71,7 @@ async def album(ctx, sub, *args):
              help='posts the given sauce \n' +
                   'nsfw is off in sfw channels unless +nsfw is used \n' +
                   'sends a pdf instead of an album when +pdf is used',
-             usage="<source number> [+nsfw]")
+             usage="<source number> [+nsfw][+pdf]")
 async def nhentai(ctx, sixdigit: int, *args):
     posts, name = fetch_hentai(sixdigit)
     if ctx.channel.type is discord.ChannelType.private:

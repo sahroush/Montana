@@ -7,3 +7,4 @@ def fetch_hentai(sixdigit):
     for i in range(douj.pages):
         links.append(douj[i])
     return links, douj.name
+    

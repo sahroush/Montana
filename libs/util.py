@@ -5,7 +5,8 @@ import random
 import requests
 from PIL import Image
 import os
-import sys
+
+Image.MAX_IMAGE_PIXELS = 10000000000000000000000000000000  
 
 colors = [0, 1752220, 3066993, 3447003, 10181046, 15844367, 15105570, 15158332,
           9807270, 8359053, 3426654, 1146986, 2067276, 2123412, 7419530, 12745742,
@@ -122,18 +123,15 @@ async def send_pdf(ctx, name , links):
     loading = await ctx.send(file=discord.File('libs/files/loading.gif'))
     images = []
     for link in links:
-        content = requests.get(link, stream=True).raw
-        size = sys.getsizeof(content)
-        if(size <= 2000000):
-            img = Image.open(content).convert('RGB')
-            w , h = img.size
-            if(w <= 8000 and h <= 5000):
+            img = Image.open(requests.get(link, stream=True).raw).convert('RGB')
+            if img.size[0] * img.size[1] <  1000000:
                 images += [img]
-            if(len(images) == 7):
+            if(len(images) > 0):
                 images[0].save(name + '.pdf' ,save_all=True, append_images=images[1:])
-                await ctx.send(file=discord.File(name + '.pdf'))
-                images = []
-                os.remove(name+".pdf")
+                if(os.stat(name + '.pdf').st_size > 6900000):
+                    await ctx.send(file=discord.File(name + '.pdf'))
+                    images = []
+                    os.remove(name+".pdf")
     if(len(images) > 0):
         images[0].save(name + '.pdf' ,save_all=True, append_images=images[1:])
         await ctx.send(file=discord.File(name + '.pdf'))

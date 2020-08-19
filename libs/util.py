@@ -121,10 +121,14 @@ async def send_pdf(ctx, name , links):
     images = []
     for link in links:
         images += [Image.open(requests.get(link, stream=True).raw).convert('RGB')]
-    images[0].save(name + '.pdf' ,save_all=True, append_images=images[1:])
-    await ctx.send(file=discord.File(name + '.pdf'))
+        if(len(images) == 10):
+            images[0].save(name + '.pdf' ,save_all=True, append_images=images[1:])
+            await ctx.send(file=discord.File(name + '.pdf'))
+            images = []
+            os.remove(name+".pdf")
+    if(len(images) > 0):
+        images[0].save(name + '.pdf' ,save_all=True, append_images=images[1:])
+        await ctx.send(file=discord.File(name + '.pdf'))
+        images = []
+        os.remove(name+".pdf")
     await loading.delete()
-    os.remove(name+".pdf")
-        
-        
-        

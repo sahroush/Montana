@@ -42,7 +42,7 @@ async def echo(ctx, *response):
                                 'shuffles posts when +random is used ' +
                                 'sends a pdf instead of an album when +pdf is used', usage="<subreddit> [+nsfw][+random][+pdf]")
 async def album(ctx, sub, *args):
-    sfw, nsfw = fetch(sub)
+    sfw, nsfw = fetch(sub , not "+pdf" in args) # pdf ==> no gifs
     posts = sfw
     if ctx.channel.type is discord.ChannelType.private:
         response = "Sorry, this command is not available in DMs :sob:"
@@ -62,7 +62,8 @@ async def album(ctx, sub, *args):
         links += [i[1]]
         names += [i[0]]
     if("+pdf" in args):
-        await send_pdf(ctx , sub , links)
+        print(links);
+        await send_pdf(ctx , sub , links[:1])
     else :
         await pagify(bot, ctx, links, names)
 

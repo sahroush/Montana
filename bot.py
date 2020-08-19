@@ -44,7 +44,7 @@ async def echo(ctx, *response):
 async def album(ctx, sub, *args):
     sfw, nsfw = fetch(sub , "+pdf" in args) # pdf ==> no gifs
     posts = sfw
-    if ctx.channel.type is discord.ChannelType.private:
+    if ctx.channel.type is discord.ChannelType.private and not "+pdf" in args:
         response = "Sorry, this command is not available in DMs :sob:"
         await ctx.send(response)
         return
@@ -74,7 +74,7 @@ async def album(ctx, sub, *args):
              usage="<source number> [+nsfw][+pdf]")
 async def nhentai(ctx, sixdigit: int, *args):
     posts, name = fetch_hentai(sixdigit)
-    if ctx.channel.type is discord.ChannelType.private:
+    if ctx.channel.type is discord.ChannelType.private and not "+pdf" in args:
         response = "Sorry, this command is not available in DMs :sob:"
         await ctx.send(response)
         return

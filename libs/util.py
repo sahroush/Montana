@@ -117,6 +117,7 @@ async def pagify(bot, ctx, links, names):
 
 
 async def send_pdf(ctx, name , links):
+    name += str(random.randint(0 , 1000000000))
     loading = await ctx.send(file=discord.File('libs/files/loading.gif'))
     images = []
     for link in links:

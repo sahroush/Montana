@@ -107,12 +107,11 @@ async def dokme(ctx):
     global STATUS
     if STATUS is Status.invisible:
         STATUS = Status.online
-        await bot.change_presence(status=STATUS)
         await ctx.send(embed=make_embed("I am online now"))
     elif STATUS is Status.online:
         STATUS = Status.invisible
         await ctx.send(embed=make_embed("Pushed dokme successfully"))
-    await bot.change_presence(status=discord.Status.invisible, activity=discord.Game(name="Use `help!"))
+    await bot.change_presence(status=STATUS, activity=discord.Game(name="Use `help!"))
 
 
 @bot.event

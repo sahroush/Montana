@@ -124,7 +124,7 @@ async def send_pdf(ctx, name , links):
     images = []
     for link in links:
             response = requests.head(link, allow_redirects=True)
-            size = response.headers.get('content-length', -1)
+            size = int(response.headers.get('content-length', -1))
             if(size < 3900000):
                 images += [Image.open(requests.get(link, stream=True).raw).convert('RGB')]
                 if(len(images) > 0):

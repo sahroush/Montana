@@ -22,9 +22,9 @@ def fetch(sub):
         for post in posts:
             ismed = ismedia(post['data']['url'])
             if ismed and post['data']['over_18']:
-                nsfw += [[post['data']['title'], "https://" + post['data']['url'][7:]]]
+                nsfw += [[post['data']['title'], "https:/" + post['data']['url'][7:]]]
             elif ismed:
-                sfw += [[post['data']['title'],  "https://" + post['data']['url'][7:]]]
+                sfw += [[post['data']['title'],  "https:/" + post['data']['url'][7:]]]
     except:
         pass
     return sfw, nsfw

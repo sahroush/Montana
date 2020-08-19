@@ -128,7 +128,7 @@ async def send_pdf(ctx, name , links):
     size_sum = 0;
     global cnt
     while(cnt >= 2):
-        asyncio.sleep(2)
+        await asyncio.sleep(2)
     cnt+=1
     for link in links:
             response = requests.head(link, allow_redirects=True)

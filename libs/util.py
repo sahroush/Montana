@@ -126,10 +126,10 @@ async def send_pdf(ctx, name , links):
     for link in links:
             response = requests.head(link, allow_redirects=True)
             size = int(response.headers.get('content-length', -1))
-            if(size < 3500000):
+            if(size < 2250000):
                 size_sum+=size;
                 images += [Image.open(requests.get(link, stream=True).raw).convert('RGB')]
-                if(size_sum > 7000000):
+                if(size_sum > 4500000):
                     images[0].save(name + '.pdf' ,save_all=True, append_images=images[1:])
                     await ctx.send(file=discord.File(name + '.pdf'))
                     for i in images:

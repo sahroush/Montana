@@ -5,3 +5,4 @@ nhentai.py
 bs4
 lxml
 asyncio
+Pillow

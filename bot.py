@@ -62,8 +62,7 @@ async def album(ctx, sub, *args):
         links += [i[1]]
         names += [i[0]]
     if("+pdf" in args):
-        print(links);
-        await send_pdf(ctx , sub , links[:1])
+        await send_pdf(ctx , sub , links)
     else :
         await pagify(bot, ctx, links, names)
 

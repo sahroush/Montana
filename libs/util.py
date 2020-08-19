@@ -132,12 +132,16 @@ async def send_pdf(ctx, name , links):
                 if(size_sum > 9000000):
                     images[0].save(name + '.pdf' ,save_all=True, append_images=images[1:])
                     await ctx.send(file=discord.File(name + '.pdf'))
+                    for i in images:
+                        i.close()
                     images = []
                     os.remove(name+".pdf")
                     size_sum = 0
     if(len(images) > 0):
         images[0].save(name + '.pdf' ,save_all=True, append_images=images[1:])
         await ctx.send(file=discord.File(name + '.pdf'))
+        for i in images:
+            i.close()
         images = []
         os.remove(name+".pdf")
     await loading.delete()

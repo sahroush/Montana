@@ -39,9 +39,10 @@ async def echo(ctx, *response):
 
 @bot.command(name='album', help='posts the most recent pics from the given subreddit \n' +
                                 'nsfw is off in sfw channels unless +nsfw is used \n' +
-                                'shuffles posts when +random is used ', usage="<subreddit> [+nsfw][+random]")
+                                'shuffles posts when +random is used ' +
+                                'sends a pdf instead of an album when +pdf is used', usage="<subreddit> [+nsfw][+random][+pdf]")
 async def album(ctx, sub, *args):
-    sfw, nsfw = fetch(sub)
+    sfw, nsfw = fetch(sub , "+pdf" in args) # pdf ==> no gifs
     posts = sfw
     if ctx.channel.type is discord.ChannelType.private:
         response = "Sorry, this command is not available in DMs :sob:"
@@ -60,13 +61,17 @@ async def album(ctx, sub, *args):
     for i in posts:
         links += [i[1]]
         names += [i[0]]
-    await pagify(bot, ctx, links, names)
+    if("+pdf" in args):
+        await send_pdf(ctx , sub , links)
+    else :
+        await pagify(bot, ctx, links, names)
 
 
 @bot.command(name='nhentai',
              help='posts the given sauce \n' +
-                  'nsfw is off in sfw channels unless +nsfw is used \n',
-             usage="<source number> [+nsfw]")
+                  'nsfw is off in sfw channels unless +nsfw is used \n' +
+                  'sends a pdf instead of an album when +pdf is used',
+             usage="<source number> [+nsfw][+pdf]")
 async def nhentai(ctx, sixdigit: int, *args):
     posts, name = fetch_hentai(sixdigit)
     if ctx.channel.type is discord.ChannelType.private:
@@ -82,7 +87,10 @@ async def nhentai(ctx, sixdigit: int, *args):
         await ctx.send(response)
         return
     names = [name] * len(posts)
-    await pagify(bot, ctx, posts, names)
+    if("+pdf" in args):
+        await send_pdf(ctx , name , posts)
+    else :
+        await pagify(bot, ctx, posts, names)
 
 
 @bot.command(name='ping', help="Used to test Montana's response time.")

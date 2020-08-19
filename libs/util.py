@@ -2,6 +2,11 @@ import textwrap
 import discord
 import asyncio
 import random
+import requests
+from PIL import Image
+import os
+
+Image.MAX_IMAGE_PIXELS = 10000000000000000000000000000000  
 
 colors = [0, 1752220, 3066993, 3447003, 10181046, 15844367, 15105570, 15158332,
           9807270, 8359053, 3426654, 1146986, 2067276, 2123412, 7419530, 12745742,
@@ -111,3 +116,40 @@ async def pagify(bot, ctx, links, names):
             break
         except:
             break
+
+
+cnt = 0;
+
+
+async def send_pdf(ctx, name , links):
+    name += str(random.randint(0 , 1000000000))
+    loading = await ctx.send(file=discord.File('libs/files/loading.gif'))
+    images = []
+    size_sum = 0;
+    global cnt
+    while(cnt >= 2):
+        asyncio.sleep(2)
+    cnt+=1
+    for link in links:
+            response = requests.head(link, allow_redirects=True)
+            size = int(response.headers.get('content-length', -1))
+            if(size < 2250000):
+                size_sum+=size;
+                images += [Image.open(requests.get(link, stream=True).raw).convert('RGB')]
+                if(size_sum > 4500000):
+                    images[0].save(name + '.pdf' ,save_all=True, append_images=images[1:])
+                    await ctx.send(file=discord.File(name + '.pdf'))
+                    for i in images:
+                        i.close()
+                    images = []
+                    os.remove(name+".pdf")
+                    size_sum = 0
+    if(len(images) > 0):
+        images[0].save(name + '.pdf' ,save_all=True, append_images=images[1:])
+        await ctx.send(file=discord.File(name + '.pdf'))
+        for i in images:
+            i.close()
+        images = []
+        os.remove(name+".pdf")
+    await loading.delete()
+    cnt -= 1

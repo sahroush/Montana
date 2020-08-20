@@ -47,7 +47,7 @@ async def album(ctx, sub, *args):
         response = "Sorry, this command is not available in DMs :sob:"
         await ctx.send(response)
         return
-    if "+nsfw" in args or ctx.channel.is_nsfw():
+    if "+nsfw" in args or (ctx.channel.type is not discord.ChannelType.private and ctx.channel.is_nsfw()):
         posts += nsfw
     if not posts:
         response = "Sorry, couldn't find a pic :sob:"

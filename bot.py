@@ -1,6 +1,4 @@
 import time
-import os
-import discord
 from discord import Status
 from discord.ext import commands
 from libs.reddit import *
@@ -37,14 +35,15 @@ async def echo(ctx, *response):
     await ctx.send(" ".join(response))
 
 
-@bot.command(name='album', help='posts the most recent pics from the given subreddit \n' +
-                                'nsfw is off in sfw channels unless +nsfw is used \n' +
-                                'shuffles posts when +random is used ' +
-                                'sends a pdf instead of an album when +pdf is used', usage="<subreddit> [+nsfw][+random][+pdf]")
+@bot.command(name='album', help='posts the most recent pics from the given subreddit \n'
+                                'nsfw is off in sfw channels unless +nsfw is used \n'
+                                'shuffles posts when +random is used'
+                                'sends a pdf instead of an album when +pdf is used',
+             usage="<subreddit> [+nsfw][+random][+pdf]")
 async def album(ctx, sub, *args):
-    sfw, nsfw = fetch(sub , "+pdf" in args) # pdf ==> no gifs
+    sfw, nsfw = fetch(sub, "+pdf" in args)  # pdf ==> no gifs
     posts = sfw
-    if ctx.channel.type is discord.ChannelType.private and not "+pdf" in args:
+    if ctx.channel.type is discord.ChannelType.private and "+pdf" not in args:
         response = "Sorry, this command is not available in DMs :sob:"
         await ctx.send(response)
         return
@@ -61,9 +60,9 @@ async def album(ctx, sub, *args):
     for i in posts:
         links += [i[1]]
         names += [i[0]]
-    if("+pdf" in args):
-        await send_pdf(ctx , sub , links)
-    else :
+    if "+pdf" in args:
+        await send_pdf(ctx, sub, links)
+    else:
         await pagify(bot, ctx, links, names)
 
 
@@ -74,7 +73,7 @@ async def album(ctx, sub, *args):
              usage="<source number> [+nsfw][+pdf]")
 async def nhentai(ctx, sixdigit: int, *args):
     posts, name = fetch_hentai(sixdigit)
-    if ctx.channel.type is discord.ChannelType.private and not "+pdf" in args:
+    if ctx.channel.type is discord.ChannelType.private and "+pdf" not in args:
         response = "Sorry, this command is not available in DMs :sob:"
         await ctx.send(response)
         return
@@ -87,9 +86,9 @@ async def nhentai(ctx, sixdigit: int, *args):
         await ctx.send(response)
         return
     names = [name] * len(posts)
-    if("+pdf" in args):
-        await send_pdf(ctx , name , posts)
-    else :
+    if "+pdf" in args:
+        await send_pdf(ctx, name, posts)
+    else:
         await pagify(bot, ctx, posts, names)
 
 

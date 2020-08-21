@@ -5,4 +5,4 @@ nhentai.py
 bs4
 lxml
 asyncio
-Pillow
+img2pdf

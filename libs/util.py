@@ -134,19 +134,18 @@ async def upload(name):
 cnt = 0
 
 
-async def makepdf(links , name): # low memory usage but slow
+async def makepdf(links , name): # low memory usage but slow af
     images = []
     img_num = 1
     for link in links:
         response = requests.head(link, allow_redirects=True)
         size = int(response.headers.get('content-length', -1))
         if size < 5000000:
-            img = Image.open(requests.get(link, stream=True).raw).convert('RGB')
-            img.save(name + str(img_num) + ".png") #won't matter as long as it's an image format
+            img = open(name + str(img_num) + ".wtf" , "wb")
+            img.write(requests.get(link).content)
             img.close()
-            images.append(name + str(img_num) + ".png")
+            images.append(name + str(img_num) + ".wtf")
             img_num+=1
-
     filename = f'{name}_{img_num}.pdf'
     pdf = open(filename , "wb")
     pdf.write(img2pdf.convert(images))

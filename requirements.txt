@@ -6,3 +6,4 @@ bs4
 lxml
 asyncio
 img2pdf
+Pillow

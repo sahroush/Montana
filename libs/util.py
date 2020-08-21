@@ -3,10 +3,9 @@ import discord
 import asyncio
 import random
 import requests
-from PIL import Image
+import img2pdf
 import os
 
-Image.MAX_IMAGE_PIXELS = 10000000000000000000000000000000
 
 colors = [0, 1752220, 3066993, 3447003, 10181046, 15844367, 15105570, 15158332,
           9807270, 8359053, 3426654, 1146986, 2067276, 2123412, 7419530, 12745742,
@@ -140,25 +139,29 @@ async def send_pdf(ctx, name, links):
     while cnt >= 2:
         await asyncio.sleep(2)
     cnt += 1
-
     name += str(random.randint(0, 1000000000))
     images = []
-    part_num = 1
-
+    img_num = 1
     for link in links:
         response = requests.head(link, allow_redirects=True)
         size = int(response.headers.get('content-length', -1))
         if size < 5000000:
-            images.append(Image.open(requests.get(link, stream=True).raw).convert('RGB'))
+            img = open(name + str(img_num) + ".wtf" , "wb")
+            img.write(requests.get(link).content)
+            img.close()
+            images.append(name + str(img_num) + ".wtf")
+            img_num+=1
 
-    filename = f'{name}_{part_num}.pdf'
-    images[0].save(filename, save_all=True, append_images=images[1:])
+    filename = f'{name}_{img_num}.pdf'
+    pdf = open(filename , "wb")
+    pdf.write(img2pdf.convert(images))
+    pdf.close()
     url = await upload(filename)
     embed = discord.Embed(title=originalname, description="", color=colors[random.randint(0, len(colors) - 1)],
                           url=url)
     await ctx.send(embed = embed)
     for i in images:
-        i.close()
+        os.remove(i)
     os.remove(filename)
     await loading.delete()
     cnt -= 1

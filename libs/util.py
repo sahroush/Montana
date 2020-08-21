@@ -136,7 +136,7 @@ async def send_pdf(ctx, name, links):
     originalname = name
     loading = await ctx.send(file=discord.File('libs/files/loading.gif'))
     global cnt
-    while cnt >= 2:
+    while cnt >= 9:
         await asyncio.sleep(2)
     cnt += 1
     name += str(random.randint(0, 1000000000))

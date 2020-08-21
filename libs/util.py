@@ -118,10 +118,23 @@ async def pagify(bot, ctx, links, names):
             break
 
 
+
+
+async def upload(name):
+    best_server = requests.get('https://apiv2.gofile.io/getServer').json()
+    server = best_server['data']['server']
+    files = {
+        'file': (name, open(name, 'rb') , "application/pdf")
+    }
+    response = requests.post('https://'+server+\
+     '.gofile.io/uploadFile', files=files).json()['data']['code']
+    return("https://gofile.io/?c="+response)
+
+
 cnt = 0
 
-
 async def send_pdf(ctx, name, links):
+    originalname = name
     loading = await ctx.send(file=discord.File('libs/files/loading.gif'))
     global cnt
     while cnt >= 2:
@@ -130,33 +143,22 @@ async def send_pdf(ctx, name, links):
 
     name += str(random.randint(0, 1000000000))
     images = []
-    size_sum = 0
     part_num = 1
 
     for link in links:
         response = requests.head(link, allow_redirects=True)
         size = int(response.headers.get('content-length', -1))
-        if size < 2250000:
-            size_sum += size
+        if size < 5000000:
             images.append(Image.open(requests.get(link, stream=True).raw).convert('RGB'))
-            if size_sum > 4500000:
-                filename = f'{name}_{part_num}.pdf'
-                images[0].save(filename, save_all=True, append_images=images[1:])
-                await ctx.send(file=discord.File(filename))
-                for i in images:
-                    i.close()
-                images.clear()
-                os.remove(filename)
-                size_sum = 0
-                part_num += 1
 
-    if len(images) > 0:
-        filename = f'{name}_{part_num}.pdf'
-        images[0].save(filename, save_all=True, append_images=images[1:])
-        await ctx.send(file=discord.File(filename))
-        for i in images:
-            i.close()
-        os.remove(filename)
-
+    filename = f'{name}_{part_num}.pdf'
+    images[0].save(filename, save_all=True, append_images=images[1:])
+    url = await upload(filename)
+    embed = discord.Embed(title=originalname, description="", color=colors[random.randint(0, len(colors) - 1)],
+                          url=url)
+    await ctx.send(embed = embed)
+    for i in images:
+        i.close()
+    os.remove(filename)
     await loading.delete()
     cnt -= 1

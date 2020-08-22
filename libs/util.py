@@ -168,6 +168,8 @@ async def fastmakepdf(links , name): # super high memory usage but fast
     return(filename)
     
 async def send_pdf(ctx, name, links):
+    if(len(name) > 25):
+          name = name[:20]
     originalname = name
     loading = await ctx.send(file=discord.File('libs/files/loading.gif'))
     global cnt

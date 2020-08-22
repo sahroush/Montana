@@ -70,7 +70,7 @@ async def album(ctx, sub, *args):
              help='posts the given sauce \n' +
                   'nsfw is off in sfw channels unless +nsfw is used \n' +
                   'sends a pdf instead of an album when +pdf is used',
-             usage="<source number> [+nsfw][+pdf]")
+             usage="<source number> [+nsfw][+pdf]" , hidden = True)
 async def nhentai(ctx, sixdigit: int, *args):
     posts, name = fetch_hentai(sixdigit)
     if ctx.channel.type is discord.ChannelType.private and "+pdf" not in args:
@@ -108,7 +108,7 @@ async def uptime(ctx):
     await ctx.send('Montana has been running for ' + pretty_time_format(time.time() - starting_time))
 
 
-@bot.command(name="dokme", help="Toggle status", aliases=['lurk'])
+@bot.command(name="dokme", help="Toggle status", aliases=['lurk'] , hidden = True)
 @commands.has_role('Admin')
 async def dokme(ctx):
     global STATUS

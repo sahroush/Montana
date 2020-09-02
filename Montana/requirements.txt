@@ -1,0 +1,10 @@
+requests
+discord.py
+python-dotenv
+nhentai.py
+bs4
+lxml
+asyncio
+img2pdf
+Pillow
+weasyprint

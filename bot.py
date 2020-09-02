@@ -3,7 +3,7 @@ from discord import Status
 from discord.ext import commands
 from libs.reddit import *
 from libs.util import *
-from libs.nhentai import *
+from libs.nhentaiparser import *
 
 TOKEN = os.getenv("TOKEN")
 if not TOKEN:

@@ -5,8 +5,7 @@ import random
 import requests
 import img2pdf
 import os
-from PIL import Image #cuz alpha is a bitch
-
+from PIL import Image  # cuz alpha is a bitch
 
 colors = [0, 1752220, 3066993, 3447003, 10181046, 15844367, 15105570, 15158332,
           9807270, 8359053, 3426654, 1146986, 2067276, 2123412, 7419530, 12745742,
@@ -118,43 +117,42 @@ async def pagify(bot, ctx, links, names):
             break
 
 
-
-
 async def upload(name):
     best_server = requests.get('https://apiv2.gofile.io/getServer').json()
     server = best_server['data']['server']
     files = {
-        'file': (name, open(name, 'rb') , "application/pdf")
+        'file': (name, open(name, 'rb'), "application/pdf")
     }
-    response = requests.post('https://'+server+\
-     '.gofile.io/uploadFile', files=files).json()['data']['code']
-    return("https://gofile.io/?c="+response)
+    response = requests.post('https://' + server + \
+                             '.gofile.io/uploadFile', files=files).json()['data']['code']
+    return "https://gofile.io/?c=" + response
 
 
 cnt = 0
 
 
-async def makepdf(links , name): # low memory usage but slow af
+async def makepdf(links, name):  # low memory usage but slow af
     images = []
     img_num = 1
     for link in links:
         response = requests.head(link, allow_redirects=True)
         size = int(response.headers.get('content-length', -1))
         if size < 5000000:
-            img = open(name + str(img_num) + ".wtf" , "wb")
+            img = open(name + str(img_num) + ".wtf", "wb")
             img.write(requests.get(link).content)
             img.close()
             images.append(name + str(img_num) + ".wtf")
-            img_num+=1
+            img_num += 1
     filename = f'{name}_{img_num}.pdf'
-    pdf = open(filename , "wb")
+    pdf = open(filename, "wb")
     pdf.write(img2pdf.convert(images))
     pdf.close()
     for i in images:
         os.remove(i)
-    return(filename)
-    
-async def fastmakepdf(links , name): # super high memory usage but fast
+    return filename
+
+
+async def fastmakepdf(links, name):  # super high memory usage but fast
     images = []
     for link in links:
         response = requests.head(link, allow_redirects=True)
@@ -165,11 +163,12 @@ async def fastmakepdf(links , name): # super high memory usage but fast
     images[0].save(filename, save_all=True, append_images=images[1:])
     for i in images:
         i.close()
-    return(filename)
-    
+    return filename
+
+
 async def send_pdf(ctx, name, links):
-    if(len(name) > 25):
-          name = name[:20]
+    if len(name) > 25:
+        name = name[:20]
     originalname = name
     loading = await ctx.send(file=discord.File('libs/files/loading.gif'))
     global cnt
@@ -177,14 +176,14 @@ async def send_pdf(ctx, name, links):
         await asyncio.sleep(2)
     cnt += 1
     name += str(random.randint(0, 1000000000))
-    if(len(links) > 50 ) :
-        filename = await makepdf(links , name)
-    else :
-        filename = await fastmakepdf(links , name)
+    if len(links) > 50:
+        filename = await makepdf(links, name)
+    else:
+        filename = await fastmakepdf(links, name)
     url = await upload(filename)
     embed = discord.Embed(title=originalname, description="", color=colors[random.randint(0, len(colors) - 1)],
                           url=url)
-    await ctx.send(embed = embed)
+    await ctx.send(embed=embed)
     os.remove(filename)
     await loading.delete()
     cnt -= 1

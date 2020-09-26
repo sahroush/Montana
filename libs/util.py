@@ -111,8 +111,11 @@ async def pagify(bot, ctx, links, names):
                 if await react(reaction, user):
                     break
         except asyncio.TimeoutError:
-            await message.clear_reactions()
-            break
+            try:
+                await message.clear_reactions()
+                break
+            except:
+                break
         except:
             break
 

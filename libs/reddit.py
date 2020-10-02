@@ -8,7 +8,7 @@ def makeUrl(afterID, sub):
 def ismedia(imageUrl):
     ismed = ('.jpg' in imageUrl or
              '.webm' in imageUrl or
-             ('.gif' in imageUrl and not pdf) or
+             ('.gif' in imageUrl ) or
              '.png' in imageUrl) and '.gifv' not in imageUrl
     return ismed
 

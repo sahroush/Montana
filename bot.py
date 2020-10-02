@@ -25,12 +25,12 @@ async def on_ready():
 async def album(ctx, *args):
     subs = ["cats" , "catsonglass" , "catsstandingup" , "catsonpizza"  , "catsvstechnology" , "illegallysmolcats" , "medievalcats" ,
     "notmycat"  , "meow_irl" , "CatSpotting" , "GrumpyCats" , "Kitty" , "Kitten" , "Kittens" , "SeniorCats" , "illegallybigcats",
-    "sadcats" , "cutecats" , "wetcats" , "displeasedkitties" , "sleepingcats" , "KittenGifs"]
+    "sadcats" , "cutecats" , "wetcats" , "sleepingcats" , "KittenGifs"]
     sub = random.choice(subs)
     sfw = fetch(sub)
     posts = sfw
     if not posts:
-        response = "no pics found in " + sub
+        response = "no pics found in " + sub + " :sob:"
         await ctx.send(response)
         return
     if "+random" in args:

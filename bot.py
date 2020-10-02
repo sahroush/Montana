@@ -4,10 +4,9 @@ from discord.ext import commands
 from libs.reddit import *
 from libs.util import *
 
+TOKEN = os.getenv("TOKEN")
 
-TOKEN = "Njk5NTk5MzkwNDMxNzcyNzMz" + ".XpWutA.0nvimxpX" + "AW7uNlwRD" + "wW1aok8Zvw"  # The most idiotic idea
-
-bot = commands.Bot(command_prefix='`')
+bot = commands.Bot(command_prefix='>')
 STATUS = Status.online
 starting_time = time.time()
 
@@ -16,14 +15,18 @@ starting_time = time.time()
 async def on_ready():
     global starting_time
     starting_time = time.time()
-    await bot.change_presence(activity=discord.Game(name="Use `help!"))
+    await bot.change_presence(activity=discord.Game(name="Use >help!"))
     print(f'{bot.user.name} has connected to Discord!')
 
 
-@bot.command(name='album', help='posts the most recent pics from the given subreddit \n'
+@bot.command(name='meow', help='posts the most recent pics from the a random cat related subreddit \n'
                                 'shuffles posts when +random is used',
-             usage="<subreddit> [+random]")
-async def album(ctx, sub, *args):
+             usage="[+random]")
+async def album(ctx, *args):
+    subs = ["cats" , "catsonglass" , "catsstandingup" , "catsonpizza" , "startledcats" , "catsvstechnology" , "illegallysmolcats" , "medievalcats" ,
+    "notmycat" , "petthedamncat" , "meow_irl" , "CatSpotting" , "GrumpyCats" , "Kitty" , "Kitten" , "Kittens" , "SeniorCats" , "illegallybigcats",
+    "sadcats" , "cutecats" , "wetcats" , "displeasedkitties" , "sleepingcats" , "KittenGifs"]
+    sub = random.choice(subs)
     sfw, nsfw = fetch(sub, "+pdf" in args)  # pdf ==> no gifs
     posts = sfw
     if ctx.channel.type is discord.ChannelType.private and "+pdf" not in args:

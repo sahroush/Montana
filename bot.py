@@ -19,7 +19,7 @@ async def on_ready():
     print(f'{bot.user.name} has connected to Discord!')
 
 
-@bot.command(name='meow', help='posts the most recent pics from the a random cat related subreddit \n'
+@bot.command(name='meow', help='posts the most recent pics from a random cat related subreddit \n'
                                 'shuffles posts when +random is used',
              usage="[+random]")
 async def album(ctx, *args):

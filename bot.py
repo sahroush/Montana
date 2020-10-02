@@ -27,16 +27,10 @@ async def album(ctx, *args):
     "notmycat" , "petthedamncat" , "meow_irl" , "CatSpotting" , "GrumpyCats" , "Kitty" , "Kitten" , "Kittens" , "SeniorCats" , "illegallybigcats",
     "sadcats" , "cutecats" , "wetcats" , "displeasedkitties" , "sleepingcats" , "KittenGifs"]
     sub = random.choice(subs)
-    sfw, nsfw = fetch(sub, "+pdf" in args)  # pdf ==> no gifs
+    sfw = fetch(sub)
     posts = sfw
-    if ctx.channel.type is discord.ChannelType.private and "+pdf" not in args:
-        response = "Sorry, this command is not available in DMs :sob:"
-        await ctx.send(response)
-        return
-    if "+nsfw" in args or (ctx.channel.type is not discord.ChannelType.private and ctx.channel.is_nsfw()):
-        posts += nsfw
     if not posts:
-        response = "Sorry, couldn't find a pic :sob:"
+        response = "no pics found in " + sub
         await ctx.send(response)
         return
     if "+random" in args:
@@ -45,11 +39,8 @@ async def album(ctx, *args):
     names = []
     for i in posts:
         links += [i[1]]
-        names += [i[0]]
-    if "+pdf" in args:
-        await send_pdf(ctx, sub, links)
-    else:
-        await pagify(bot, ctx, links, names)
+        names += ["/r/"+sub]
+    await pagify(bot, ctx, links, names)
 
 
 @bot.command(name='ping', help="Used to test Montana's response time.")

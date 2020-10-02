@@ -23,8 +23,8 @@ async def on_ready():
                                 'shuffles posts when +random is used',
              usage="[+random]")
 async def album(ctx, *args):
-    subs = ["cats" , "catsonglass" , "catsstandingup" , "catsonpizza" , "startledcats" , "catsvstechnology" , "illegallysmolcats" , "medievalcats" ,
-    "notmycat" , "petthedamncat" , "meow_irl" , "CatSpotting" , "GrumpyCats" , "Kitty" , "Kitten" , "Kittens" , "SeniorCats" , "illegallybigcats",
+    subs = ["cats" , "catsonglass" , "catsstandingup" , "catsonpizza"  , "catsvstechnology" , "illegallysmolcats" , "medievalcats" ,
+    "notmycat"  , "meow_irl" , "CatSpotting" , "GrumpyCats" , "Kitty" , "Kitten" , "Kittens" , "SeniorCats" , "illegallybigcats",
     "sadcats" , "cutecats" , "wetcats" , "displeasedkitties" , "sleepingcats" , "KittenGifs"]
     sub = random.choice(subs)
     sfw = fetch(sub)

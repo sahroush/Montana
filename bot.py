@@ -43,7 +43,7 @@ async def album(ctx, *args):
     await pagify(bot, ctx, links, names)
 
 
-@bot.command(name='ping', help="Used to test Montana's response time.")
+@bot.command(name='ping', help="Used to test NekoBot's response time.")
 async def ping(ctx):
     start = time.perf_counter()
     message = await ctx.send(':ping_pong: Pong!')
@@ -56,7 +56,7 @@ async def ping(ctx):
 @bot.command(name='uptime', help="Prints bot uptime")
 async def uptime(ctx):
     global starting_time
-    await ctx.send('Montana has been running for ' + pretty_time_format(time.time() - starting_time))
+    await ctx.send('NekoBot has been running for ' + pretty_time_format(time.time() - starting_time))
 
 
 @bot.event

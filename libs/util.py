@@ -11,11 +11,6 @@ colors = [0, 1752220, 3066993, 3447003, 10181046, 15844367, 15105570, 15158332,
 
 
 def wrapped(s):
-    wrapper = textwrap.TextWrapper(width=20)
-    word_list = wrapper.wrap(text=s)
-    s = ""
-    for word in word_list:
-        s += '\n' + word
     return s
 
 

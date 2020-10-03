@@ -25,7 +25,7 @@ async def on_ready():
 async def album(ctx, *args):
     subs = ["cats" , "catsonglass" , "catsstandingup" , "catsonpizza"  , "catsvstechnology" , "illegallysmolcats" , "medievalcats" ,
     "notmycat"  , "meow_irl" , "CatSpotting" , "GrumpyCats" , "Kitty" , "Kitten" , "Kittens" , "SeniorCats" , "illegallybigcats",
-    "sadcats" , "cutecats" , "wetcats" , "sleepingcats" , "KittenGifs"]
+    "sadcats" , "cutecats" , "wetcats" , "sleepingcats" , "KittenGifs" , "catbellies" , "catsareliquid" , "catsinwaterpackages"]
     sub = random.choice(subs)
     sfw = fetch(sub)
     posts = sfw

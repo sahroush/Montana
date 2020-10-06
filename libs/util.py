@@ -105,10 +105,8 @@ async def pagify(bot, ctx, links, names):
                     break
         except asyncio.TimeoutError:
             try:
-                for reaction in message.reactions:
-                    if str(reaction.emoji) in emojis:
-                        await message.clear_reaction(reaction , message.author)
-                #await message.clear_reactions()
+                for reaction in emojis:
+                    await message.clear_reaction(reaction)
                 break
             except:
                 break

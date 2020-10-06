@@ -66,10 +66,9 @@ async def pagify(bot, ctx, links, names):
         if str(reaction) in emojis:
             await message.remove_reaction(reaction, user)
         return (str(reaction) in emojis)
-    reacts = []
     await message.clear_reactions()
     for emoji in emojis:
-        reacts += [await message.add_reaction(str(emoji))]
+        await message.add_reaction(str(emoji))
 
     async def react(reaction, user):
         nonlocal cur
@@ -106,8 +105,9 @@ async def pagify(bot, ctx, links, names):
                     break
         except asyncio.TimeoutError:
             try:
-                for reaction in reacts:
-                    await message.clear_reaction(reaction , message.author)
+                for reaction in message.reactions:
+                    if str(reaction.emoji) in emojis:
+                        await message.clear_reaction(reaction , message.author)
                 #await message.clear_reactions()
                 break
             except:

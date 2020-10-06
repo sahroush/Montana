@@ -63,8 +63,9 @@ async def pagify(bot, ctx, links, names):
         return True  # made by user || third party
 
     async def Check(reaction, user):
-        await message.remove_reaction(reaction, user)
-        return not (user != ctx.author or not (str(reaction) in emojis))
+        if str(reaction) in emojis:
+            await message.remove_reaction(reaction, user)
+        return (str(reaction) in emojis)
 
     await message.clear_reactions()
     for emoji in emojis:

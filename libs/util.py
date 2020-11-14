@@ -6,6 +6,7 @@ import requests
 import img2pdf
 import os
 from PIL import Image  # cuz alpha is a bitch
+from collections import namedtuple
 
 colors = [0, 1752220, 3066993, 3447003, 10181046, 15844367, 15105570, 15158332,
           9807270, 8359053, 3426654, 1146986, 2067276, 2123412, 7419530, 12745742,
@@ -55,6 +56,7 @@ def make_embed(text):
 
 async def pagify(bot, ctx, links, names, public=False):
     cur = 0
+    emojis = namedtuple("Emoji", ["prev", "next", "remove"])("⏪", "⏩", "🗑")
 
     def embed_creator():
         nonlocal cur
@@ -80,22 +82,21 @@ async def pagify(bot, ctx, links, names, public=False):
         react_emoji = str(reaction)
         await message.remove_reaction(reaction, user)
 
-        if react_emoji == "🗑":
+        if react_emoji == emojis.remove:
             await message.delete()
             await ctx.message.delete()
             return True
 
-        if react_emoji == "⏩" and cur < len(links) - 1:
+        if react_emoji == emojis.next and cur < len(links) - 1:
             cur += 1
             await message.edit(embed=embed_creator())
 
-        elif react_emoji == "⏪" and cur > 0:
+        elif react_emoji == emojis.prev and cur > 0:
             cur -= 1
             await message.edit(embed=embed_creator())
 
         return False
 
-    emojis = ["⏪", "⏩", "🗑"]
     message = await ctx.send(embed=embed_creator())
     for emoji in emojis:
         await message.add_reaction(emoji)

@@ -78,30 +78,25 @@ async def pagify(bot, ctx, links, names, public=False):
         nonlocal cur
 
         react_emoji = str(reaction)
-        if react_emoji in emojis:
-            await message.remove_reaction(reaction, user)
-
-        if react_emoji == "⏩" and cur < len(links) - 1:
-            cur += 1
-            await message.edit(embed=embed_creator())
-            await message.remove_reaction(reaction, user)
-
-        if react_emoji == "⏪" and cur > 0:
-            cur -= 1
-            await message.edit(embed=embed_creator())
-            await message.remove_reaction(reaction, user)
+        await message.remove_reaction(reaction, user)
 
         if react_emoji == "🗑":
             await message.delete()
             await ctx.message.delete()
             return True
+
+        if react_emoji == "⏩" and cur < len(links) - 1:
+            cur += 1
+            await message.edit(embed=embed_creator())
+
+        elif react_emoji == "⏪" and cur > 0:
+            cur -= 1
+            await message.edit(embed=embed_creator())
+
         return False
 
-    message = await ctx.send(embed=embed_creator())
-
     emojis = ["⏪", "⏩", "🗑"]
-
-    await message.clear_reactions()
+    message = await ctx.send(embed=embed_creator())
     for emoji in emojis:
         await message.add_reaction(emoji)
 

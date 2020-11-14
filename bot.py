@@ -7,6 +7,7 @@ from libs.nhentaiparser import *
 
 TOKEN = os.getenv("TOKEN")
 
+BigBrainTime = commands.Bot(command_prefix='```') # :joy:
 bot = commands.Bot(command_prefix='`')
 STATUS = Status.online
 starting_time = time.time()

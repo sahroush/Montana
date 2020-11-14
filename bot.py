@@ -7,7 +7,7 @@ from libs.nhentaiparser import *
 
 TOKEN = os.getenv("TOKEN")
 
-bot = commands.Bot(command_prefix='`')
+bot = commands.Bot(command_prefix=commands.when_mentioned_or('`'))
 STATUS = Status.online
 starting_time = time.time()
 
@@ -123,6 +123,8 @@ async def dokme(ctx):
 async def on_command_error(ctx, error):
     if STATUS is Status.invisible:
         return
+    if isinstance(error, commands.CommandNotFound):
+        return await ctx.message.add_reaction('\U0001F928')
     await ctx.send(embed=make_embed(error))
 
 

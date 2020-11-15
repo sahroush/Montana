@@ -7,3 +7,4 @@ lxml
 asyncio
 img2pdf
 Pillow
+pytz

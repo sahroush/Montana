@@ -6,6 +6,7 @@ import requests
 import img2pdf
 import os
 from PIL import Image  # cuz alpha is a bitch
+from collections import namedtuple
 
 colors = [0, 1752220, 3066993, 3447003, 10181046, 15844367, 15105570, 15158332,
           9807270, 8359053, 3426654, 1146986, 2067276, 2123412, 7419530, 12745742,
@@ -53,69 +54,65 @@ def make_embed(text):
     return discord.Embed(description=str(text), color=colors[random.randint(0, len(colors) - 1)])
 
 
-async def pagify(bot, ctx, links, names):
+async def pagify(bot, ctx, links, names, public=False):
     cur = 0
-    embed = discord.Embed(title=wrapped(names[cur]), description="", color=colors[random.randint(0, len(colors) - 1)],
-                          url=links[cur])
-    embed.set_footer(text=str(cur + 1) + "/" + str(len(links)))
-    embed.set_image(url=links[cur])
+    emojis = namedtuple("Emoji", ["prev", "next", "remove"])("⏪", "⏩", "🗑")
 
-    message = await ctx.send(embed=embed)
+    def embed_creator():
+        nonlocal cur
+        embed = discord.Embed(title=wrapped(names[cur]), description="", color=242424, url=links[cur])
+        embed.set_footer(text=str(cur + 1) + "/" + str(len(links)))
+        embed.set_image(url=links[cur])
+        return embed
 
-    emojis = ["⏪", "⏩", "🗑"]
-
-    def check(reaction, user):
-        if user == message.author or reaction.message.id != message.id:  # the reaction was made by the bot itself
+    def reaction_trigger(reaction, user):
+        if reaction.message.id != message.id:  # reacted on other messages
+            return False
+        if user == message.author:  # the reaction was made by the bot itself
+            return False
+        if not public and user != ctx.author:  # made by other users
+            return False
+        if str(reaction) not in emojis:  # not trigger emoji
             return False
         return True  # made by user || third party
 
-    async def Check(reaction, user):
-        await message.remove_reaction(reaction, user)
-        return not (user != ctx.author or not (str(reaction) in emojis))
-
-    await message.clear_reactions()
-    for emoji in emojis:
-        await message.add_reaction(str(emoji))
-
-    async def react(reaction, user):
+    async def react_handler(reaction, user):
         nonlocal cur
-        if str(reaction.emoji) == "⏩":
-            if cur == len(links) - 1:
-                return False
-            cur += 1
-            embed = discord.Embed(title=wrapped(names[cur]), description="", color=242424, url=links[cur])
-            embed.set_footer(text=str(cur + 1) + "/" + str(len(links)))
-            embed.set_image(url=links[cur])
-            await message.edit(embed=embed)
-            await message.remove_reaction(reaction, user)
 
-        if str(reaction.emoji) == "⏪":
-            if cur == 0:
-                return False
-            cur -= 1
-            embed = discord.Embed(title=wrapped(names[cur]), description="", color=242424, url=links[cur])
-            embed.set_footer(text=str(cur + 1) + "/" + str(len(links)))
-            embed.set_image(url=links[cur])
-            await message.edit(embed=embed)
-            await message.remove_reaction(reaction, user)
+        react_emoji = str(reaction)
+        await message.remove_reaction(reaction, user)
 
-        if str(reaction.emoji) == "🗑":
+        if react_emoji == emojis.remove:
             await message.delete()
             await ctx.message.delete()
             return True
 
+        if react_emoji == emojis.next and cur < len(links) - 1:
+            cur += 1
+            await message.edit(embed=embed_creator())
+
+        elif react_emoji == emojis.prev and cur > 0:
+            cur -= 1
+            await message.edit(embed=embed_creator())
+
+        return False
+
+    message = await ctx.send(embed=embed_creator())
+    for emoji in emojis:
+        await message.add_reaction(emoji)
+
     while True:
         try:
-            reaction, user = await bot.wait_for("reaction_add", timeout=180, check=check)
-            if await Check(reaction, user):
-                if await react(reaction, user):
-                    break
+            reaction, user = await bot.wait_for("reaction_add", timeout=180, check=reaction_trigger)
+            if await react_handler(reaction, user):
+                break
         except asyncio.TimeoutError:
             try:
-                await message.clear_reactions()
-                break
-            except:
-                break
+                for emoji in emojis:
+                    await message.clear_reaction(emoji)
+            except discord.NotFound:
+                pass
+            break
         except:
             break
 

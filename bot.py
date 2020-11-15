@@ -124,18 +124,19 @@ async def dokme(ctx):
     await bot.change_presence(status=STATUS, activity=discord.Game(name="Use `help!"))
 
 
-@bot.command(name="remind", brief="Set a reminder", usage="<hh:mm> <message>")
+@bot.command(name="remind", brief="Set a reminder", usage="hh:mm[:ss] <message>")
 async def remind(ctx, finish: str, *msg):
     """Set a reminder to echo <message> at given time.
     You may mention some role in your message"""
 
-    hour, minute = list(map(int, finish.split(":")))
-    if hour < 0 or hour >= 24 or minute < 0 or minute >= 60:
+    hour, minute, *second = list(map(int, finish.split(":")))
+    second = second[0] if second else 0
+    if hour < 0 or hour >= 24 or minute < 0 or minute >= 60 or second < 0 or second >= 60:
         raise ValueError("Given time is not formatted properly")
 
     now = datetime.now(localtz)
     when = localtz.localize(datetime(year=now.year, month=now.month, day=now.day,
-                                     hour=hour, minute=minute))
+                                     hour=hour, minute=minute, second=second))
     if when < now:
         return await ctx.send("Time travel?")
 

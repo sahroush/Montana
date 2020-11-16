@@ -35,7 +35,7 @@ async def echo(ctx, *response):
 @bot.command(name='vote', help='Starts a vote', usage="[message...]")
 async def echo(ctx, *response):
     if not response:
-        await ctx.add_reaction("🐐")
+        await ctx.message.add_reaction("🐐")
     if response : 
         msg = await ctx.send(" ".join(response))
         await ctx.message.delete()

@@ -35,9 +35,9 @@ async def echo(ctx, *response):
 @bot.command(name='vote', help='Starts a vote', usage="[message...]")
 async def echo(ctx, *response):
     if not response:
-        response = ["**I can't send an empty message you fucking idiot**"]
-    msg = await ctx.send(" ".join(response))
+        await ctx.add_reaction("🐐")
     if response : 
+        msg = await ctx.send(" ".join(response))
         await ctx.message.delete()
         await msg.add_reaction("👍")
         await msg.add_reaction("👎")

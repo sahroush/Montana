@@ -131,7 +131,7 @@ async def remind(ctx, finish: str, *msg):
 
     hour, minute, *second = list(map(int, finish.split(":")))
     second = second[0] if second else 0
-    if hour < 0 or hour >= 24 or minute < 0 or minute >= 60 or second < 0 or second >= 60:
+    if not (0 <= hour < 24 and 0 <= minute < 60 or 0 <= second < 60):
         raise ValueError("Given time is not formatted properly")
 
     now = datetime.now(localtz)

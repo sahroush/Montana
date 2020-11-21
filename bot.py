@@ -1,6 +1,5 @@
 import time
 import pytz
-import asyncio
 from datetime import datetime
 from discord import Status
 from discord.ext import commands
@@ -131,7 +130,7 @@ async def remind(ctx, finish: str, *msg):
 
     hour, minute, *second = list(map(int, finish.split(":")))
     second = second[0] if second else 0
-    if not (0 <= hour < 24 and 0 <= minute < 60 or 0 <= second < 60):
+    if not (0 <= hour < 24 and 0 <= minute < 60 and 0 <= second < 60):
         raise ValueError("Given time is not formatted properly")
 
     now = datetime.now(localtz)

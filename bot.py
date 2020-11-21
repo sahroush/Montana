@@ -141,7 +141,7 @@ async def remind(ctx, finish: str, *msg):
 
     msg = ' '.join(msg)
     await ctx.message.delete()
-    await ctx.send(embed=make_embed(f"Set a reminder at {finish}, \"{msg}\""))
+    await ctx.send(embed=make_embed(f"<@{ctx.author.id}> set a reminder at {finish}, \"{msg}\""))
     delta = when - now
     await asyncio.sleep(delta.total_seconds())
     await ctx.send(msg)

@@ -1,4 +1,6 @@
 import time
+import pytz
+from datetime import datetime
 from discord import Status
 from discord.ext import commands
 from libs.reddit import *
@@ -10,6 +12,8 @@ TOKEN = os.getenv("TOKEN")
 bot = commands.Bot(command_prefix=commands.when_mentioned_or('`'))
 STATUS = Status.online
 starting_time = time.time()
+
+localtz = pytz.timezone("Asia/Tehran")
 
 
 @bot.event
@@ -117,6 +121,30 @@ async def dokme(ctx):
         STATUS = Status.invisible
         await ctx.send(embed=make_embed("Pushed dokme successfully"))
     await bot.change_presence(status=STATUS, activity=discord.Game(name="Use `help!"))
+
+
+@bot.command(name="remind", brief="Set a reminder", usage="hh:mm[:ss] <message>")
+async def remind(ctx, finish: str, *msg):
+    """Set a reminder to echo <message> at given time.
+    You may mention some role in your message"""
+
+    hour, minute, *second = list(map(int, finish.split(":")))
+    second = second[0] if second else 0
+    if not (0 <= hour < 24 and 0 <= minute < 60 and 0 <= second < 60):
+        raise ValueError("Given time is not formatted properly")
+
+    now = datetime.now(localtz)
+    when = localtz.localize(datetime(year=now.year, month=now.month, day=now.day,
+                                     hour=hour, minute=minute, second=second))
+    if when < now:
+        return await ctx.send("Time travel?")
+
+    msg = ' '.join(msg)
+    await ctx.message.delete()
+    await ctx.send(embed=make_embed(f"<@{ctx.author.id}> set a reminder at {finish}, \"{msg}\""))
+    delta = when - now
+    await asyncio.sleep(delta.total_seconds())
+    await ctx.send(msg)
 
 
 @bot.event

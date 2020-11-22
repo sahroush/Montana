@@ -1,5 +1,6 @@
 import time
 import pytz
+import discord
 from datetime import datetime
 from discord import Status
 from discord.ext import commands
@@ -137,12 +138,19 @@ async def dokme(ctx):
 @bot.command(name="remind", brief="Set a reminder", usage="hh:mm[:ss] <message>")
 async def remind(ctx, finish: str, *msg):
     """Set a reminder to echo <message> at given time.
-    You may mention some role in your message"""
+    You may mention some role or use +<rolename> in your message"""
 
     hour, minute, *second = list(map(int, finish.split(":")))
     second = second[0] if second else 0
-    if not (0 <= hour < 24 and 0 <= minute < 60 and 0 <= second < 60):
+    if not (0 <= hour < 24 and 0 <= minute < 60 and 0 <= second < 60) or len(finish.split(':')) > 3:
         raise ValueError("Given time is not formatted properly")
+
+    content = []
+    for word in msg:
+        if len(word) > 1 and word.startswith('+'):
+            word = (await commands.RoleConverter().convert(ctx, word[1:])).mention
+        content.append(word)
+    content = ' '.join(content)
 
     now = datetime.now(localtz)
     when = localtz.localize(datetime(year=now.year, month=now.month, day=now.day,
@@ -150,12 +158,11 @@ async def remind(ctx, finish: str, *msg):
     if when < now:
         return await ctx.send("Time travel?")
 
-    msg = ' '.join(msg)
     await ctx.message.delete()
-    await ctx.send(embed=make_embed(f"<@{ctx.author.id}> set a reminder at {finish}, \"{msg}\""))
+    await ctx.send(embed=make_embed(f"{ctx.author.mention} set a reminder at {finish}, \"{content}\""))
     delta = when - now
     await asyncio.sleep(delta.total_seconds())
-    await ctx.send(msg)
+    await ctx.send(f"**{ctx.author.mention}**:\n{content}")
 
 
 @bot.event

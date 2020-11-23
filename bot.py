@@ -37,16 +37,17 @@ async def echo(ctx, *response):
         response = ["**I can't send an empty message you fucking idiot**"]
     await ctx.send(" ".join(response))
 
+
 @bot.command(name='vote', help='Starts a vote', usage="[message...]")
-async def echo(ctx, *response):
+async def vote(ctx, *response):
     if not response:
-        await ctx.message.add_reaction("🐐")
-    if response : 
-        msg = await ctx.send(" ".join(response))
-        await ctx.message.delete()
-        await msg.add_reaction("👍")
-        await msg.add_reaction("👎")
-        await msg.add_reaction("🤷")
+        return await ctx.message.add_reaction("🐐")
+    response = " ".join(response)
+    msg = await ctx.send(f"**{ctx.author.display_name}**:\n{response}")
+    await ctx.message.delete()
+    await msg.add_reaction("👍")
+    await msg.add_reaction("👎")
+    await msg.add_reaction("🤷")
 
 
 @bot.command(name='album', help='posts the most recent pics from the given subreddit \n'

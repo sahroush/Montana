@@ -42,7 +42,7 @@ async def echo(ctx, *response):
 async def vote(ctx, text, *options):
     text = " ".join(text)
     await ctx.message.delete()
-    if(!options):
+    if not options:
         msg = await ctx.send(f"**{ctx.author.display_name}**:\n{text}")
         await msg.add_reaction("👍")
         await msg.add_reaction("👎")

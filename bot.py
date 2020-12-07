@@ -40,20 +40,20 @@ async def echo(ctx, *response):
 
 @bot.command(name='vote', help='Starts a vote', usage="<\"question\"> [\"options\"...]")
 async def vote(ctx, text, *options):
-    await ctx.message.delete()
     if not options:
         msg = await ctx.send(f"**{ctx.author.display_name}**:\n{text}")
         await msg.add_reaction("👍")
         await msg.add_reaction("👎")
         await msg.add_reaction("🤷")
-    else:
-        emojis = ["🇦" , "🇧" , "🇨" , "🇩" , "🇪" , "🇫" , "🇬" , "🇭" , "🇮" , "🇯" , "🇰" , "🇱" , "🇲" , "🇳" , "🇴" , "🇵"]
+    elif len(options) <= 26:
         for i in range(len(options)):
-            text = text + '\n' + emojis[i] + ": " + options[i]
+            text = text + '\n' + chr(127462 + i) + ": " + options[i]
         msg = await ctx.send(f"**{ctx.author.display_name}**:\n{text}")
         for i in range(len(options)):
-            await msg.add_reaction(emojis[i])
-        
+            await msg.add_reaction(chr(127462 + i))
+    else:
+        return await ctx.send("Too many options!")
+    await ctx.message.delete()
 
 
 @bot.command(name='album', help='posts the most recent pics from the given subreddit \n'

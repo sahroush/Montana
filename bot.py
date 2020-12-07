@@ -38,9 +38,8 @@ async def echo(ctx, *response):
     await ctx.send(" ".join(response))
 
 
-@bot.command(name='vote', help='Starts a vote', usage="<text> [+options...]")
+@bot.command(name='vote', help='Starts a vote', usage="<"question"> ["options"...]")
 async def vote(ctx, text, *options):
-    text = " ".join(text)
     await ctx.message.delete()
     if not options:
         msg = await ctx.send(f"**{ctx.author.display_name}**:\n{text}")
@@ -48,7 +47,7 @@ async def vote(ctx, text, *options):
         await msg.add_reaction("👎")
         await msg.add_reaction("🤷")
     else:
-        emojis = ["🇦" , "🇧" , "🇨" , "🇩" , "🇪" , "🇫"]
+        emojis = ["🇦" , "🇧" , "🇨" , "🇩" , "🇪" , "🇫" , "🇬" , "🇭" , "🇮" , "🇯" , "🇰" , "🇱" , "🇲" , "🇳" , "🇴" , "🇵"]
         for i in range(len(options)):
             text = text + '\n' + emojis[i] + ": " + options[i]
         msg = await ctx.send(f"**{ctx.author.display_name}**:\n{text}")

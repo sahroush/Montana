@@ -38,16 +38,23 @@ async def echo(ctx, *response):
     await ctx.send(" ".join(response))
 
 
-@bot.command(name='vote', help='Starts a vote', usage="[message...]")
-async def vote(ctx, *response):
-    if not response:
-        return await ctx.message.add_reaction("🐐")
-    response = " ".join(response)
-    msg = await ctx.send(f"**{ctx.author.display_name}**:\n{response}")
+@bot.command(name='vote', help='Starts a vote', usage="<text> [+options...]")
+async def vote(ctx, text, *options):
+    test = " ".join(test)
+    if(!options):
+        msg = await ctx.send(f"**{ctx.author.display_name}**:\n{text}")
+        await msg.add_reaction("👍")
+        await msg.add_reaction("👎")
+        await msg.add_reaction("🤷")
     await ctx.message.delete()
-    await msg.add_reaction("👍")
-    await msg.add_reaction("👎")
-    await msg.add_reaction("🤷")
+    if(options):
+        emojis = ["🇦" , "🇧" , "🇨" , "🇩" , "🇪" , "🇫"]
+        for i in range(len(options)):
+            text = test + '\n' + emojis[i] + ": " + options[i]
+        msg = await ctx.send(f"**{ctx.author.display_name}**:\n{text}")
+        for i in range(len(options)):
+            await msg.add_reaction(emojis[i])
+        
 
 
 @bot.command(name='album', help='posts the most recent pics from the given subreddit \n'

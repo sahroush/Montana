@@ -38,7 +38,7 @@ async def echo(ctx, *response):
     await ctx.send(" ".join(response))
 
 
-@bot.command(name='vote', help='Starts a vote', usage="<\"question"> ["options"...]")
+@bot.command(name='vote', help='Starts a vote', usage="<\"question\"> [\"options\"...]")
 async def vote(ctx, text, *options):
     await ctx.message.delete()
     if not options:

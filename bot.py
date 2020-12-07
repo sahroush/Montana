@@ -40,17 +40,17 @@ async def echo(ctx, *response):
 
 @bot.command(name='vote', help='Starts a vote', usage="<text> [+options...]")
 async def vote(ctx, text, *options):
-    test = " ".join(test)
+    text = " ".join(text)
+    await ctx.message.delete()
     if(!options):
         msg = await ctx.send(f"**{ctx.author.display_name}**:\n{text}")
         await msg.add_reaction("👍")
         await msg.add_reaction("👎")
         await msg.add_reaction("🤷")
-    await ctx.message.delete()
-    if(options):
+    else:
         emojis = ["🇦" , "🇧" , "🇨" , "🇩" , "🇪" , "🇫"]
         for i in range(len(options)):
-            text = test + '\n' + emojis[i] + ": " + options[i]
+            text = text + '\n' + emojis[i] + ": " + options[i]
         msg = await ctx.send(f"**{ctx.author.display_name}**:\n{text}")
         for i in range(len(options)):
             await msg.add_reaction(emojis[i])

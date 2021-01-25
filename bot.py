@@ -38,16 +38,22 @@ async def echo(ctx, *response):
     await ctx.send(" ".join(response))
 
 
-@bot.command(name='vote', help='Starts a vote', usage="[message...]")
-async def vote(ctx, *response):
-    if not response:
-        return await ctx.message.add_reaction("🐐")
-    response = " ".join(response)
-    msg = await ctx.send(f"**{ctx.author.display_name}**:\n{response}")
+@bot.command(name='vote', help='Starts a vote', usage="<\"question\"> [\"options\"...]")
+async def vote(ctx, text, *options):
+    if not options:
+        msg = await ctx.send(f"**{ctx.author.display_name}**:\n{text}")
+        await msg.add_reaction("👍")
+        await msg.add_reaction("👎")
+        await msg.add_reaction("🤷")
+    elif len(options) <= 26:
+        for i in range(len(options)):
+            text = text + '\n' + chr(127462 + i) + ": " + options[i]
+        msg = await ctx.send(f"**{ctx.author.display_name}**:\n{text}")
+        for i in range(len(options)):
+            await msg.add_reaction(chr(127462 + i))
+    else:
+        return await ctx.send("Too many options!")
     await ctx.message.delete()
-    await msg.add_reaction("👍")
-    await msg.add_reaction("👎")
-    await msg.add_reaction("🤷")
 
 
 @bot.command(name='album', help='posts the most recent pics from the given subreddit \n'

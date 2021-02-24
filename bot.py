@@ -39,7 +39,7 @@ async def echo(ctx, *response):
 
 @bot.command(name='mashtali')
 async def mashtali(ctx):
-    await ctx.send("تخته: https://idroo.com/board-5odTuNxlSF" + '\n' + "داک: https://docs.google.com/spreadsheets/d/1rWpFA3IQz7okNZNWhoYKuaHGbp9jVUol37P2WNr2KWc")
+    await ctx.send("takhte: <https://idroo.com/board-5odTuNxlSF>" + '\n' + "doc: <https://docs.google.com/spreadsheets/d/1rWpFA3IQz7okNZNWhoYKuaHGbp9jVUol37P2WNr2KWc>")
     
 @bot.command(name='vote', help='Starts a vote', usage="<\"question\"> [\"options\"...]")
 async def vote(ctx, text, *options):

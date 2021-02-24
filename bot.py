@@ -37,7 +37,7 @@ async def echo(ctx, *response):
         response = ["**I can't send an empty message you fucking idiot**"]
     await ctx.send(" ".join(response))
 
-@bot.command(name='mashtali')
+@bot.command(name='mashtali', aliases=['shahali'], hidden=True)
 async def mashtali(ctx):
     await ctx.send("takhte: <https://idroo.com/board-5odTuNxlSF>" + '\n' + "doc: <https://docs.google.com/spreadsheets/d/1rWpFA3IQz7okNZNWhoYKuaHGbp9jVUol37P2WNr2KWc>")
     

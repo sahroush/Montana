@@ -1,6 +1,7 @@
 import time
 import pytz
 import discord
+import random
 from datetime import datetime
 from discord import Status
 from discord.ext import commands
@@ -9,8 +10,8 @@ from libs.util import *
 from libs.nhentaiparser import *
 
 TOKEN = os.getenv("TOKEN")
-
-bot = commands.Bot(command_prefix=commands.when_mentioned_or('`'))
+intents = discord.Intents.all()  # Not good choice
+bot = commands.Bot(command_prefix=commands.when_mentioned_or('`'), intents=intents)
 STATUS = Status.online
 starting_time = time.time()
 
@@ -173,6 +174,56 @@ async def remind(ctx, finish: str, *msg):
     delta = when - now
     await asyncio.sleep(delta.total_seconds())
     await ctx.send(f"**{ctx.author.mention}**:\n{content}")
+
+
+@bot.command(name='zanbil', brief='Start zanbil detector')
+async def zanbil(ctx, duration: int = 900, penalty: int = 5, channel: discord.VoiceChannel = None):
+    if channel is None:
+        # find the crowd voice channel
+        for ch in ctx.guild.voice_channels:
+            if channel is None or len(ch.members) > len(channel.members):
+                channel = ch
+        if channel is None or not channel.members:
+            return await ctx.send(f'no non-empty VC found')
+    if not duration > 0 < penalty:
+        raise ValueError('duration and penalty time should be positive')
+
+    skeletboard = {}
+    await ctx.send('zanbil detector started!')
+    await asyncio.sleep(duration)
+
+    while len(channel.members) > 0:
+        # select a member
+        khardar = random.choice(channel.members)
+        msg = await ctx.send(f'{khardar.mention}, react \U0001F9FA in {penalty} sec or get skelet')
+
+        # wait for react
+        await msg.add_reaction('\U0001F9FA')
+        await asyncio.sleep(penalty)
+
+        # check if reacted
+        msg = await ctx.fetch_message(msg.id)
+        goodboys = []
+        for r in msg.reactions:
+            if r.emoji == '\U0001F9FA':
+                goodboys += await r.users().flatten()
+        if khardar in goodboys:
+            await msg.add_reaction('\U0001F44C')
+        else:
+            await msg.add_reaction('\U0001F480')
+            skeletboard[khardar.mention] = skeletboard.setdefault(khardar.mention, 0) + 1
+
+        # wait for next period
+        await asyncio.sleep(duration)
+
+    # output summary
+    embed = discord.Embed(title='Skelet Summary')
+    if skeletboard:
+        sorted_board = sorted(skeletboard.items(), key=lambda x: -x[1])
+        embed.description = '\n'.join(f'{m} got {fib(s + 1)} \U0001F480' for m, s in sorted_board)
+    else:
+        embed.description = 'no skelet at all'
+    await ctx.send(f'everybody left the channel', embed=embed)
 
 
 @bot.event

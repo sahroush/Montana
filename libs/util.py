@@ -187,3 +187,10 @@ async def send_pdf(ctx, name, links):
     os.remove(filename)
     await loading.delete()
     cnt -= 1
+
+
+def fib(n):
+    a, b = 0, 1
+    for i in range(n):
+        a, b = b, a + b
+    return a

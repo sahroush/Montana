@@ -178,7 +178,7 @@ async def remind(ctx, finish: str, *msg):
 
 @bot.command(name='zanbil', brief='Start zanbil detector' ,
  help='Start zanbil detector, write zange tafrih or zange to stop' ,
- usage='`zanbil [duration=900] [penalty=5] [channel]')
+ usage='[duration=900] [penalty=5] [channel]')
 @commands.has_role('Admin' or 'teacher')
 async def zanbil(ctx, duration: int = 900, penalty: int = 5, channel: discord.VoiceChannel = None):
     if channel is None:

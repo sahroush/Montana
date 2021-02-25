@@ -237,7 +237,7 @@ async def zanbil(ctx, duration: int = 900, penalty: int = 5, channel: discord.Vo
         embed.description = '\n'.join(f'{m} got {fib(s + 1)} \U0001F480' for m, s in sorted_board)
     else:
         embed.description = 'no zanbil at all'
-    await ctx.send(f'everybody left the channel', embed=embed)
+    await ctx.send(f'Zanbil detection is over', embed=embed)
 
 
 @bot.event

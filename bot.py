@@ -176,10 +176,10 @@ async def remind(ctx, finish: str, *msg):
     await ctx.send(f"**{ctx.author.mention}**:\n{content}")
 
 
-@bot.command(name='zanbil', brief='Start zanbil detector' ,
- help='Start zanbil detector, write zange tafrih or zange to stop' ,
- usage='[duration=900] [penalty=5] [channel]')
-@commands.has_role('teacher')
+@bot.command(name='zanbil', brief='Start zanbil detector',
+             help='Start zanbil detector, write "break" or "zange" to stop',
+             usage='[duration=900] [penalty=5] [channel]')
+@commands.has_any_role('teacher', 'Admin')
 async def zanbil(ctx, duration: int = 900, penalty: int = 5, channel: discord.VoiceChannel = None):
     if channel is None:
         # find the crowd voice channel
@@ -190,29 +190,32 @@ async def zanbil(ctx, duration: int = 900, penalty: int = 5, channel: discord.Vo
             return await ctx.send(f'no non-empty VC found')
     if not duration > 0 < penalty:
         raise ValueError('duration and penalty time should be positive')
+
     skeletboard = {}
     await ctx.send('zanbil detector started!')
-    #await asyncio.sleep(duration) //the early bird catches the biggest worm
+    # await asyncio.sleep(duration)  # the early bird catches the biggest worm
 
-    while len(channel.members) > 0:
-        
-        #check for breaks
-        def check(m):
-            return m.author == ctx.author and (m.content == 'zange tafrih' or m.content == 'zange' or m.content == 'siktir')
+    # callback for check breaks
+    def check_break(msg):
+        return msg.author == ctx.author and msg.content in ('break', 'zange', 'siktir')
+
+    # sleep for sec and check for break command
+    async def sleep_for(sec):
         try:
-            msg = await bot.wait_for('message', timeout=duration ,check=check)
+            await bot.wait_for('message', timeout=sec, check=check_break)
         except asyncio.TimeoutError:
-            pass
-        else:
-            break
-            
+            return True
+        return False
+
+    while await sleep_for(duration) and channel.members:
         # select a member
         khardar = random.choice(channel.members)
         msg = await ctx.send(f'{khardar.mention}, react \U0001F590 in {penalty} sec or get skelet')
 
         # wait for react
         await msg.add_reaction('\U0001F590')
-        await asyncio.sleep(penalty)
+        if not await sleep_for(penalty):
+            break
 
         # check if reacted
         msg = await ctx.fetch_message(msg.id)
@@ -225,10 +228,6 @@ async def zanbil(ctx, duration: int = 900, penalty: int = 5, channel: discord.Vo
         else:
             await msg.add_reaction('\U0001F9FA')
             skeletboard[khardar.mention] = skeletboard.setdefault(khardar.mention, 0) + 1
-        """
-        # wait for next period
-        await asyncio.sleep(duration)
-        """
 
     # output summary
     embed = discord.Embed(title='Zanbil Summary')
@@ -237,7 +236,7 @@ async def zanbil(ctx, duration: int = 900, penalty: int = 5, channel: discord.Vo
         embed.description = '\n'.join(f'{m} got {fib(s + 1)} \U0001F480' for m, s in sorted_board)
     else:
         embed.description = 'no zanbil at all'
-    await ctx.send(f'Zanbil detection is over', embed=embed)
+    await ctx.send(f'zanbil detection is over', embed=embed)
 
 
 @bot.event

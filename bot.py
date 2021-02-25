@@ -177,6 +177,7 @@ async def remind(ctx, finish: str, *msg):
 
 
 @bot.command(name='zanbil', brief='Start zanbil detector')
+@commands.has_role('Admin' or 'teacher')
 async def zanbil(ctx, duration: int = 900, penalty: int = 5, channel: discord.VoiceChannel = None):
     if channel is None:
         # find the crowd voice channel
@@ -187,10 +188,9 @@ async def zanbil(ctx, duration: int = 900, penalty: int = 5, channel: discord.Vo
             return await ctx.send(f'no non-empty VC found')
     if not duration > 0 < penalty:
         raise ValueError('duration and penalty time should be positive')
-
     skeletboard = {}
     await ctx.send('zanbil detector started!')
-    await asyncio.sleep(duration)
+    #await asyncio.sleep(duration) //the early bird catches the biggest worm
 
     while len(channel.members) > 0:
         # select a member
@@ -212,9 +212,19 @@ async def zanbil(ctx, duration: int = 900, penalty: int = 5, channel: discord.Vo
         else:
             await msg.add_reaction('\U0001F9FA')
             skeletboard[khardar.mention] = skeletboard.setdefault(khardar.mention, 0) + 1
-
+        """
         # wait for next period
         await asyncio.sleep(duration)
+        """
+        #check for breaks
+        def check(m):
+            return m.author == ctx.author and (m.content == 'zange tafrih' or m.content == 'zange' or m.content == 'siktir')
+        try:
+            msg = await ctx.wait_for('message', timeout=duration ,check=check)
+        except asyncio.TimeoutError:
+            pass
+        else:
+            break
 
     # output summary
     embed = discord.Embed(title='Zanbil Summary')

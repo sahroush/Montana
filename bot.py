@@ -191,9 +191,19 @@ async def zanbil(ctx, duration: int = 900, penalty: int = 5, channel: discord.Vo
     skeletboard = {}
     await ctx.send('zanbil detector started!')
     #await asyncio.sleep(duration) //the early bird catches the biggest worm
-    
 
     while len(channel.members) > 0:
+        
+        #check for breaks
+        def check(m):
+            return m.author == ctx.author and (m.content == 'zange tafrih' or m.content == 'zange' or m.content == 'siktir')
+        try:
+            msg = await bot.wait_for('message', timeout=duration ,check=check)
+        except asyncio.TimeoutError:
+            pass
+        else:
+            break
+            
         # select a member
         khardar = random.choice(channel.members)
         msg = await ctx.send(f'{khardar.mention}, react \U0001F590 in {penalty} sec or get skelet')
@@ -217,15 +227,6 @@ async def zanbil(ctx, duration: int = 900, penalty: int = 5, channel: discord.Vo
         # wait for next period
         await asyncio.sleep(duration)
         """
-        #check for breaks
-        def check(m):
-            return m.author == ctx.author and (m.content == 'zange tafrih' or m.content == 'zange' or m.content == 'siktir')
-        try:
-            msg = await bot.wait_for('message', timeout=duration ,check=check)
-        except asyncio.TimeoutError:
-            pass
-        else:
-            break
 
     # output summary
     embed = discord.Embed(title='Zanbil Summary')

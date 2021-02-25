@@ -211,7 +211,10 @@ async def zanbil(ctx, duration: int = 900, penalty: int = 5, channel: discord.Vo
 
     while await sleep_for(duration) and channel.members:
         # select a member
+        Bot = discord.utils.get(ctx.guild.roles, name="BOT")
         khardar = random.choice(channel.members)
+        while Bot in khardar.roles : 
+            khardar = random.choice(channel.members) #not the most elegant way to do it but whatever
         msg = await ctx.send(f'{khardar.mention}, react \U0001F590 in {penalty} sec or get skelet')
 
         # wait for react

@@ -220,7 +220,7 @@ async def zanbil(ctx, duration: int = 900, penalty: int = 5, channel: discord.Vo
         def check(m):
             return m.author == ctx.author and (m.content == 'zange tafrih' or m.content == 'zange' or m.content == 'siktir')
         try:
-            msg = await ctx.wait_for('message', timeout=duration ,check=check)
+            msg = await bot.wait_for('message', timeout=duration ,check=check)
         except asyncio.TimeoutError:
             pass
         else:

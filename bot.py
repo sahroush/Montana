@@ -176,7 +176,7 @@ async def remind(ctx, finish: str, *msg):
     await ctx.send(f"**{ctx.author.mention}**:\n{content}")
 
 
-@bot.command(name='zanbil', brief='Start zanbil detector')
+@bot.command(name='zanbil', brief='Start zanbil detector, write zange tafrih, zange to stop zanbil detection')
 @commands.has_role('Admin' or 'teacher')
 async def zanbil(ctx, duration: int = 900, penalty: int = 5, channel: discord.VoiceChannel = None):
     if channel is None:
@@ -191,6 +191,7 @@ async def zanbil(ctx, duration: int = 900, penalty: int = 5, channel: discord.Vo
     skeletboard = {}
     await ctx.send('zanbil detector started!')
     #await asyncio.sleep(duration) //the early bird catches the biggest worm
+    
 
     while len(channel.members) > 0:
         # select a member

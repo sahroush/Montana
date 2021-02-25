@@ -195,34 +195,34 @@ async def zanbil(ctx, duration: int = 900, penalty: int = 5, channel: discord.Vo
     while len(channel.members) > 0:
         # select a member
         khardar = random.choice(channel.members)
-        msg = await ctx.send(f'{khardar.mention}, react \U0001F9FA in {penalty} sec or get skelet')
+        msg = await ctx.send(f'{khardar.mention}, react \U0001F590 in {penalty} sec or get skelet')
 
         # wait for react
-        await msg.add_reaction('\U0001F9FA')
+        await msg.add_reaction('\U0001F590')
         await asyncio.sleep(penalty)
 
         # check if reacted
         msg = await ctx.fetch_message(msg.id)
         goodboys = []
         for r in msg.reactions:
-            if r.emoji == '\U0001F9FA':
+            if r.emoji == '\U0001F590':
                 goodboys += await r.users().flatten()
         if khardar in goodboys:
             await msg.add_reaction('\U0001F44C')
         else:
-            await msg.add_reaction('\U0001F480')
+            await msg.add_reaction('\U0001F9FA')
             skeletboard[khardar.mention] = skeletboard.setdefault(khardar.mention, 0) + 1
 
         # wait for next period
         await asyncio.sleep(duration)
 
     # output summary
-    embed = discord.Embed(title='Skelet Summary')
+    embed = discord.Embed(title='Zanbil Summary')
     if skeletboard:
         sorted_board = sorted(skeletboard.items(), key=lambda x: -x[1])
         embed.description = '\n'.join(f'{m} got {fib(s + 1)} \U0001F480' for m, s in sorted_board)
     else:
-        embed.description = 'no skelet at all'
+        embed.description = 'no zanbil at all'
     await ctx.send(f'everybody left the channel', embed=embed)
 
 

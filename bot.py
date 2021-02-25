@@ -176,7 +176,7 @@ async def remind(ctx, finish: str, *msg):
     await ctx.send(f"**{ctx.author.mention}**:\n{content}")
 
 
-@bot.command(name='zanbil', brief='Start zanbil detector, write zange tafrih, zange to stop zanbil detection')
+@bot.command(name='zanbil', brief='Start zanbil detector write zange tafrih or zange to stop')
 @commands.has_role('Admin' or 'teacher')
 async def zanbil(ctx, duration: int = 900, penalty: int = 5, channel: discord.VoiceChannel = None):
     if channel is None:

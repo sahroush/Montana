@@ -197,7 +197,9 @@ async def zanbil(ctx, duration: int = 900, penalty: int = 5, channel: discord.Vo
 
     # callback for check breaks
     def check_break(msg):
-        return msg.author == ctx.author and msg.content in ('break', 'zange', 'siktir')
+        Admin = discord.utils.get(ctx.guild.roles, name="Admin")
+        teacher = discord.utils.get(ctx.guild.roles, name="teacher")
+        return (Admin in msg.author.roles or teacher in msg.author.roles) and msg.content in ('break', 'zange', 'siktir')
 
     # sleep for sec and check for break command
     async def sleep_for(sec):

@@ -182,17 +182,15 @@ async def remind(ctx, finish: str, *msg):
 @commands.has_any_role('teacher', 'Admin')
 async def zanbil(ctx, duration: int = 900, penalty: int = 5, channel: discord.VoiceChannel = None):
     if channel is None:
-        # find the crowd voice channel
-        for ch in ctx.guild.voice_channels:
-            if channel is None or len(ch.members) > len(channel.members):
-                channel = ch
-        if channel is None or not channel.members:
-            return await ctx.send(f'no non-empty VC found')
+        # find ctx.author voice channel
+        if ctx.author.voice is None or ctx.author.voice.channel is None:
+            return await ctx.send(f'you are not in any vc')
+        channel = ctx.author.voice.channel
     if not duration > 0 < penalty:
         raise ValueError('duration and penalty time should be positive')
 
     skeletboard = {}
-    await ctx.send('zanbil detector started!')
+    await ctx.send(f'zanbil detector started at {channel.name}!')
 
     # callback for check breaks
     def check_break(msg):

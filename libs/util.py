@@ -194,3 +194,11 @@ def fib(n):
     for i in range(n):
         a, b = b, a + b
     return a
+
+
+def has_any_strrole(seq, *roles):
+    return any(r.name in roles for r in seq)
+
+
+def filter_bots(members):
+    return [m for m in members if not m.bot]

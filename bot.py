@@ -41,7 +41,7 @@ async def echo(ctx, *response):
 @bot.command(name='mashtali', aliases=['shahali'], hidden=True)
 async def mashtali(ctx):
     await ctx.send("takhte: <https://idroo.com/board-5odTuNxlSF>" + '\n' + "doc: <https://docs.google.com/spreadsheets/d/1rWpFA3IQz7okNZNWhoYKuaHGbp9jVUol37P2WNr2KWc>")
-    
+
 @bot.command(name='vote', help='Starts a vote', usage="<\"question\"> [\"options\"...]")
 async def vote(ctx, text, *options):
     if not options:
@@ -193,13 +193,10 @@ async def zanbil(ctx, duration: int = 900, penalty: int = 5, channel: discord.Vo
 
     skeletboard = {}
     await ctx.send('zanbil detector started!')
-    # await asyncio.sleep(duration)  # the early bird catches the biggest worm
 
     # callback for check breaks
     def check_break(msg):
-        Admin = discord.utils.get(ctx.guild.roles, name="Admin")
-        teacher = discord.utils.get(ctx.guild.roles, name="teacher")
-        return (Admin in msg.author.roles or teacher in msg.author.roles) and msg.content in ('break', 'zange', 'siktir')
+        return has_any_strrole(msg.author.roles, 'Admin', 'teacher') and msg.content in ('break', 'zange', 'siktir')
 
     # sleep for sec and check for break command
     async def sleep_for(sec):
@@ -209,12 +206,9 @@ async def zanbil(ctx, duration: int = 900, penalty: int = 5, channel: discord.Vo
             return True
         return False
 
-    while await sleep_for(duration) and channel.members:
+    while await sleep_for(duration) and filter_bots(channel.members):
         # select a member
-        Bot = discord.utils.get(ctx.guild.roles, name="BOT")
-        khardar = random.choice(channel.members)
-        while Bot in khardar.roles : 
-            khardar = random.choice(channel.members) #not the most elegant way to do it but whatever
+        khardar = random.choice(filter_bots(channel.members))
         msg = await ctx.send(f'{khardar.mention}, react \U0001F590 in {penalty} sec or get skelet')
 
         # wait for react

@@ -177,10 +177,9 @@ async def remind(ctx, finish: str, *msg):
 
 
 @bot.command(name='zanbil', brief='Start zanbil detector',
-             help='Start zanbil detector, write "break" or "zange" to stop',
-             usage='[duration=900] [penalty=5] [channel]')
+             help='Start zanbil detector, write "break" or "zange" to stop')
 @commands.has_any_role('teacher', 'Admin')
-async def zanbil(ctx, duration: int = 900, penalty: int = 5, channel: discord.VoiceChannel = None):
+async def zanbil(ctx, duration: int = 600, penalty: int = 20, channel: discord.VoiceChannel = None):
     if channel is None:
         # find ctx.author voice channel
         if ctx.author.voice is None or ctx.author.voice.channel is None:

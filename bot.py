@@ -194,7 +194,11 @@ async def zanbil(ctx, duration: int = 900, penalty: int = 5, channel: discord.Vo
 
     # callback for check breaks
     def check_break(msg):
-        return has_any_strrole(msg.author.roles, 'Admin', 'teacher') and msg.content in ('break', 'zange', 'siktir')
+        return msg.channel == ctx.channel and \
+               not msg.author.bot and \
+               msg.author.voice is not None and msg.author.voice.channel == channel and \
+               has_any_strrole(msg.author.roles, 'Admin', 'teacher') and \
+               msg.content in ('break', 'zange', 'siktir')
 
     # sleep for sec and check for break command
     async def sleep_for(sec):

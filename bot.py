@@ -183,7 +183,7 @@ async def remind(ctx, finish: str, *msg):
         raise ValueError("Given time is not formatted properly")
     now = datetime.now(localtz)
     await ctx.message.delete()
-    msg = await ctx.send(embed=make_embed(f"{ctx.author.mention} Created a countdown"))
+    msg = await ctx.send("Countdown created!")
     def countdown(hour , minute , second , msg):
         if hour + minute + second == 0 :
             msg.edit(content="Time's Up :boom:")

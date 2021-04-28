@@ -193,7 +193,7 @@ async def countdown(ctx, finish: str, *msg):
         elif (hour > 0):
             hour -= 1
             minute += 59
-	await msg.edit(content=(str(hour) + " hours, " + str(minute) + " minutes, " + str(second) + " seconds remaining"))
+        await msg.edit(content=(str(hour) + " hours, " + str(minute) + " minutes, " + str(second) + " seconds remaining"))
     await msg.edit(content="Time's Up :boom:")
     
 

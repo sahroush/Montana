@@ -196,7 +196,7 @@ async def remind(ctx, finish: str, *msg):
             elif (hour > 0):
                 hour -= 1
                 minute += 59
-                await msg.edit(content=(str(hour) + " hours, " str(minute) + " minutes, " + str(second) + " seconds remaining"))
+                await msg.edit(content=(str(hour) + " hours, " + str(minute) + " minutes, " + str(second) + " seconds remaining"))
                 await countdown(hour , minute , second , msg)
 			
     

@@ -200,7 +200,7 @@ async def remind(ctx, finish: str, *msg):
                 countdown(hour , minute , second , msg)
 			
     
-    await countdown(hour , minute , second , msg)
+    countdown(hour , minute , second , msg)
 
 @bot.command(name='zanbil', brief='Start zanbil detector',
              help='Start zanbil detector, write "break" or "zange" to stop')

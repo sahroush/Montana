@@ -194,6 +194,7 @@ async def countdown(ctx, finish: str, *msg):
             hour -= 1
             minute += 59
         await msg.edit(content=(str(hour) + " hours, " + str(minute) + " minutes, " + str(second) + " seconds remaining"))
+        await asyncio.sleep(1)
     await msg.edit(content="Time's Up :boom:")
     
 

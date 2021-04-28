@@ -186,7 +186,7 @@ async def remind(ctx, finish: str, *msg):
     msg = await ctx.send(embed=make_embed(f"{ctx.author.mention} Created a countdown"))
     def countdown(hour , minute , second , msg):
         if hour + minute + second == 0 :
-            await msg.edit(content="Time's Up :boom:")
+            msg.edit(content="Time's Up :boom:")
         else:
             if(second > 0):
                 second -= 1
@@ -196,8 +196,8 @@ async def remind(ctx, finish: str, *msg):
             elif (hour > 0):
                 hour -= 1
                 minute += 59
-                await msg.edit(content=(str(hour) + " hours, " + str(minute) + " minutes, " + str(second) + " seconds remaining"))
-                await countdown(hour , minute , second , msg)
+                msg.edit(content=(str(hour) + " hours, " + str(minute) + " minutes, " + str(second) + " seconds remaining"))
+                countdown(hour , minute , second , msg)
 			
     
     await countdown(hour , minute , second , msg)

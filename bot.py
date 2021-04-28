@@ -175,6 +175,37 @@ async def remind(ctx, finish: str, *msg):
     await asyncio.sleep(delta.total_seconds())
     await ctx.send(f"**{ctx.author.mention}**:\n{content}")
 
+@bot.command(name="countdown", brief="Create a countdown", usage="hh:mm[:ss] <message>")
+async def remind(ctx, finish: str, *msg):
+
+    hour, minute, *second = list(map(int, finish.split(":")))
+    second = second[0] if second else 0
+    if not (0 <= hour and 0 <= minute < 60 and 0 <= second < 60) or len(finish.split(':')) > 3:
+        raise ValueError("Given time is not formatted properly")
+
+    now = datetime.now(localtz)
+
+    await ctx.message.delete()
+    
+    msg = await ctx.send(embed=make_embed(f"{ctx.author.mention} Created a countdown"))
+    
+    def countdown(hour , minute , second , msg):
+		if hour + minute + second == 0 :
+			await msg.edit(content="Time's Up :boom:")
+		else:
+			if(second > 0):
+				second -= 1
+			elif (minute > 0):
+				minute -= 1
+				second += 59
+			elif (hour > 0):
+				hour -= 1
+				minute += 59
+			await msg.edit(content=(str(hour) + " hours, " str(minute) + " minutes, " + str(second) + " seconds remaining"))
+			countdown(hour , minute , second , msg)
+			
+    
+    await countdown(hour , minute , second , msg)
 
 @bot.command(name='zanbil', brief='Start zanbil detector',
              help='Start zanbil detector, write "break" or "zange" to stop')

@@ -196,6 +196,7 @@ async def countdown(ctx, finish: str, *msg):
         await msg.edit(content=(str(hour) + " hours, " + str(minute) + " minutes, " + str(second) + " seconds remaining"))
         await asyncio.sleep(1)
     await msg.edit(content="Time's Up :boom:")
+    await ctx.send(file=discord.File('libs/files/timeup.gif'))
     
 
 @bot.command(name='zanbil', brief='Start zanbil detector',

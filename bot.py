@@ -2,7 +2,7 @@ import time
 import pytz
 import discord
 import random
-from datetime import datetime
+from datetime import datetime, timedelta
 from discord import Status
 from discord.ext import commands
 from libs.reddit import *
@@ -175,25 +175,20 @@ async def remind(ctx, finish: str, *msg):
     await asyncio.sleep(delta.total_seconds())
     await ctx.send(f"**{ctx.author.mention}**:\n{content}")
 
+
 @bot.command(name="countdown", brief="Create a countdown", usage="hh:mm[:ss] <message>")
 async def countdown(ctx, finish: str, *msg):
     hour, minute, *second = list(map(int, finish.split(":")))
     second = second[0] if second else 0
-    if not (0 <= hour and 0 <= minute < 60 and 0 <= second < 60) or len(finish.split(':')) > 3:
+    if not (0 <= hour < 24 and 0 <= minute < 60 and 0 <= second < 60) or len(finish.split(':')) > 3:
         raise ValueError("Given time is not formatted properly")
-    now = datetime.now(localtz)
+    delta = timedelta(hours=hour, minutes=minute, seconds=second)
     await ctx.message.delete()
     msg = await ctx.send("Countdown created!")
-    while( hour + minute + second > 0):
-        if(second > 0):
-            second -= 1
-        elif (minute > 0):
-            minute -= 1
-            second += 59
-        elif (hour > 0):
-            hour -= 1
-            minute += 59
-        await msg.edit(content=(str(hour) + " hours, " + str(minute) + " minutes, " + str(second) + " seconds remaining"))
+    while delta:
+        delta -= timedelta(seconds=1)
+        h, m, s = map(int, str(delta).split(':'))
+        await msg.edit(content=f"{h} hours, {m} minutes, {s} seconds remaining")
         await asyncio.sleep(1)
     await msg.edit(content="Time's Up :boom:")
     await ctx.send(file=discord.File('libs/files/timeup.gif'))

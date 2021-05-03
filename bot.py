@@ -7,7 +7,7 @@ from discord import Status
 from discord.ext import commands
 from libs.reddit import *
 from libs.util import *
-from libs.nhentaiparser import *
+from libs.nhparser import *
 
 TOKEN = os.getenv("TOKEN")
 intents = discord.Intents.all()  # Not good choice

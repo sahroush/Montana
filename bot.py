@@ -37,11 +37,15 @@ async def echo(ctx, *response):
     if not response:
         response = ["**I can't send an empty message you fucking idiot**"]
     await ctx.send(" ".join(response))
+
+
 """rip mashtali 2020-2021
 @bot.command(name='mashtali', aliases=['shahali'], hidden=True)
 async def mashtali(ctx):
     await ctx.send("takhte: <https://idroo.com/board-5odTuNxlSF>" + '\n' + "doc: <https://docs.google.com/spreadsheets/d/1rWpFA3IQz7okNZNWhoYKuaHGbp9jVUol37P2WNr2KWc>")
 """
+
+
 @bot.command(name='vote', help='Starts a vote', usage="<\"question\"> [\"options\"...]")
 async def vote(ctx, text, *options):
     if not options:
@@ -59,6 +63,7 @@ async def vote(ctx, text, *options):
         return await ctx.send("Too many options!")
     await ctx.message.delete()
 
+
 @bot.command(name='patak', help='Starts a patak vote')
 async def patak(ctx , *options):
     numbers = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣"]
@@ -69,6 +74,7 @@ async def patak(ctx , *options):
     for number in numbers:
         await zibayi.add_reaction(number)
     await ctx.message.delete()
+
 
 @bot.command(name='album', help='posts the most recent pics from the given subreddit \n'
                                 'nsfw is off in sfw channels unless +nsfw is used \n'

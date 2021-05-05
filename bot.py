@@ -61,13 +61,13 @@ async def vote(ctx, text, *options):
 
 @bot.command(name='patak', help='Starts a patak vote')
 async def patak(ctx , *options):
-    sakhti = await ctx.send(embed=make_embed("سختی"))
+    sakhti = await ctx.send(embed=make_embed("**سختی**"))
     await sakhti.add_reaction("1️⃣")
     await sakhti.add_reaction("2️⃣")
     await sakhti.add_reaction("3️⃣")
     await sakhti.add_reaction("4️⃣")
     await sakhti.add_reaction("5️⃣")
-    zibayi = await ctx.send(embed=make_embed("زیبایی"))
+    zibayi = await ctx.send(embed=make_embed("**زیبایی**"))
     await zibayi.add_reaction("1️⃣")
     await zibayi.add_reaction("2️⃣")
     await zibayi.add_reaction("3️⃣")

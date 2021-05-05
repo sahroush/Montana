@@ -37,11 +37,11 @@ async def echo(ctx, *response):
     if not response:
         response = ["**I can't send an empty message you fucking idiot**"]
     await ctx.send(" ".join(response))
-
+"""rip mashtali 2020-2021
 @bot.command(name='mashtali', aliases=['shahali'], hidden=True)
 async def mashtali(ctx):
     await ctx.send("takhte: <https://idroo.com/board-5odTuNxlSF>" + '\n' + "doc: <https://docs.google.com/spreadsheets/d/1rWpFA3IQz7okNZNWhoYKuaHGbp9jVUol37P2WNr2KWc>")
-
+"""
 @bot.command(name='vote', help='Starts a vote', usage="<\"question\"> [\"options\"...]")
 async def vote(ctx, text, *options):
     if not options:

@@ -38,9 +38,13 @@ async def echo(ctx, *response):
         response = ["**I can't send an empty message you fucking idiot**"]
     await ctx.send(" ".join(response))
 
+
+"""rip mashtali 2020-2021
 @bot.command(name='mashtali', aliases=['shahali'], hidden=True)
 async def mashtali(ctx):
     await ctx.send("takhte: <https://idroo.com/board-5odTuNxlSF>" + '\n' + "doc: <https://docs.google.com/spreadsheets/d/1rWpFA3IQz7okNZNWhoYKuaHGbp9jVUol37P2WNr2KWc>")
+"""
+
 
 @bot.command(name='vote', help='Starts a vote', usage="<\"question\"> [\"options\"...]")
 async def vote(ctx, text, *options):
@@ -57,6 +61,18 @@ async def vote(ctx, text, *options):
             await msg.add_reaction(chr(127462 + i))
     else:
         return await ctx.send("Too many options!")
+    await ctx.message.delete()
+
+
+@bot.command(name='patak', help='Starts a patak vote')
+async def patak(ctx , *options):
+    numbers = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣"]
+    sakhti = await ctx.send(embed=make_embed("**سختی**"))
+    for number in numbers:
+        await sakhti.add_reaction(number)
+    zibayi = await ctx.send(embed=make_embed("**زیبایی**"))
+    for number in numbers:
+        await zibayi.add_reaction(number)
     await ctx.message.delete()
 
 
@@ -189,7 +205,7 @@ async def countdown(ctx, finish: str, *msg):
         delta -= timedelta(seconds=1)
         h, m, s = map(int, str(delta).split(':'))
         await msg.edit(content=f"{h} hours, {m} minutes, {s} seconds remaining")
-        await asyncio.sleep(1)
+        await asyncio.sleep(0.98)
     await msg.edit(content="Time's Up :boom:")
     await ctx.send(file=discord.File('libs/files/timeup.gif'))
     

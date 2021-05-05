@@ -199,7 +199,7 @@ async def countdown(ctx, finish: str, *msg):
         delta -= timedelta(seconds=1)
         h, m, s = map(int, str(delta).split(':'))
         await msg.edit(content=f"{h} hours, {m} minutes, {s} seconds remaining")
-        await asyncio.sleep(1)
+        await asyncio.sleep(0.98)
     await msg.edit(content="Time's Up :boom:")
     await ctx.send(file=discord.File('libs/files/timeup.gif'))
     

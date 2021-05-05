@@ -61,18 +61,14 @@ async def vote(ctx, text, *options):
 
 @bot.command(name='patak', help='Starts a patak vote')
 async def patak(ctx , *options):
+    numbers = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣"]
     sakhti = await ctx.send(embed=make_embed("**سختی**"))
-    await sakhti.add_reaction("1️⃣")
-    await sakhti.add_reaction("2️⃣")
-    await sakhti.add_reaction("3️⃣")
-    await sakhti.add_reaction("4️⃣")
-    await sakhti.add_reaction("5️⃣")
+    for number in numbers:
+        await sakhti.add_reaction(number)
     zibayi = await ctx.send(embed=make_embed("**زیبایی**"))
-    await zibayi.add_reaction("1️⃣")
-    await zibayi.add_reaction("2️⃣")
-    await zibayi.add_reaction("3️⃣")
-    await zibayi.add_reaction("4️⃣")
-    await zibayi.add_reaction("5️⃣")
+    for number in numbers:
+        await zibayi.add_reaction(number)
+    await ctx.message.delete()
 
 @bot.command(name='album', help='posts the most recent pics from the given subreddit \n'
                                 'nsfw is off in sfw channels unless +nsfw is used \n'

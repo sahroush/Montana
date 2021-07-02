@@ -2,15 +2,26 @@ import asyncio
 import os
 import random
 import textwrap
+import tempfile
 
+import aiohttp
+import aiofiles
 import discord
 import img2pdf
-import requests
+import requests # keep for backward compatibility
 from PIL import Image  # cuz alpha is a bitch
 
 colors = [0, 1752220, 3066993, 3447003, 10181046, 15844367, 15105570, 15158332,
           9807270, 8359053, 3426654, 1146986, 2067276, 2123412, 7419530, 12745742,
           11027200, 10038562, 9936031, 12370112, 2899536, 16580705, 12320855]
+
+
+def with_session(func):
+    async def wrapper(*args, **kwargs):
+        async with aiohttp.ClientSession(headers={"User-Agent": "Montana/1.0"}) as session:
+            result = await func(session, *args, **kwargs)
+        return result
+    return wrapper
 
 
 def wrapped(s):
@@ -51,18 +62,34 @@ def pretty_time_format(seconds, *, shorten=False, only_most_significant=False, a
 
 
 def make_embed(text):
-    return discord.Embed(description=str(text), color=colors[random.randint(0, len(colors) - 1)])
+    return discord.Embed(description=str(text), color=random.choice(colors))
 
 
-async def upload(name):
-    best_server = requests.get('https://apiv2.gofile.io/getServer').json()
-    server = best_server['data']['server']
-    files = {
-        'file': (name, open(name, 'rb'), "application/pdf")
-    }
-    response = requests.post('https://' + server + \
-                             '.gofile.io/uploadFile', files=files).json()['data']['code']
-    return "https://gofile.io/?c=" + response
+async def filesender(file_name=None):
+    async with aiofiles.open(file_name, 'rb') as f:
+        chunk = await f.read(64*1024)
+        while chunk:
+            yield chunk
+            chunk = await f.read(64*1024)
+
+
+@with_session
+async def upload(session, name):
+    async with session.get('https://apiv2.gofile.io/getServer') as resp:
+        data = await resp.json()
+        server = data['data']['server']
+    upload_uri = f'https://{server}.gofile.io/uploadFile'
+    postdata = aiohttp.FormData()
+    postdata.add_field(
+        'file',
+        filesender(name),
+        filename=name,
+        content_type='application/pdf'
+    )
+    async with session.post(upload_uri, data=postdata) as resp:
+        data = await resp.json()
+        code = data['data']['code']
+    return f"https://gofile.io/?c={code}"
 
 
 async def makepdf(links, name):  # low memory usage but slow af
@@ -100,23 +127,46 @@ async def fastmakepdf(links, name):  # super high memory usage but fast
     return filename
 
 
-_pdfsem = asyncio.Semaphore(5)
+@with_session
+async def async_makepdf(session, links, name):
+    with tempfile.TemporaryDirectory() as tempdir:
+        files = []
+        for i, link in enumerate(links):
+            async with session.head(link, allow_redirects=True) as resp:
+                size = int(resp.headers.get('Content-Length', -1))
+            if size > 5e6:  # 5 MB
+                continue
+            image_filename = f'{tempdir}/{i}.idk'
+            async with session.get(link) as resp:
+                content = await resp.content.read()
+            imgio = img2pdf.BytesIO(content)
+            image = Image.open(imgio).convert('RGB')
+            image.save(image_filename, format='PNG')
+            files.append(image_filename)
+        filename = f'{name}.pdf'
+        async with aiofiles.open(filename, mode='wb') as file:
+            await file.write(img2pdf.convert(files))
+    return filename
+
+
+_pdfsem = asyncio.Semaphore(2)
 async def send_pdf(ctx, name, links):
     if len(name) > 25:
         name = name[:20]
     originalname = name
-    loading = await ctx.send(file=discord.File('libs/files/loading.gif'))
+    loading = await ctx.send(file=discord.File('static/loading.gif'))
     async with _pdfsem:
         name += str(random.randint(0, 1000000000))
-        if len(links) > 50:
-            filename = await makepdf(links, name)
-        else:
-            filename = await fastmakepdf(links, name)
+        filename = await async_makepdf(links, name)
+        # if len(links) > 50:
+        #     filename = await makepdf(links, name)
+        # else:
+        #     filename = await fastmakepdf(links, name)
         url = await upload(filename)
         embed = discord.Embed(
             title=originalname,
             description="",
-            color=colors[random.randint(0, len(colors) - 1)],
+            color=random.choice(colors),
             url=url
         )
         await ctx.send(embed=embed)

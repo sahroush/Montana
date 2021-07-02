@@ -83,7 +83,7 @@ async def patak(ctx , *options):
                                 'sends a pdf instead of an album when +pdf is used',
              usage="<subreddit> [+nsfw][+random][+pdf]")
 async def album(ctx, sub, *args):
-    sfw, nsfw = fetch(sub, "+pdf" in args)  # pdf ==> no gifs
+    sfw, nsfw = await fetch(sub, "+pdf" in args)  # pdf ==> no gifs
     posts = sfw
     if ctx.channel.type is discord.ChannelType.private and "+pdf" not in args:
         response = "Sorry, this command is not available in DMs :sob:"
@@ -97,11 +97,7 @@ async def album(ctx, sub, *args):
         return
     if "+random" in args:
         random.shuffle(posts)
-    links = []
-    names = []
-    for i in posts:
-        links += [i[1]]
-        names += [i[0]]
+    names, links = list(zip(*posts))
     if "+pdf" in args:
         await send_pdf(ctx, sub, links)
     else:
@@ -210,7 +206,7 @@ async def countdown(ctx, finish: str, *msg):
         await msg.edit(content=f"{h} hours, {m} minutes, {s} seconds remaining")
         await asyncio.sleep(0.98)
     await msg.edit(content="Time's Up :boom:")
-    await ctx.send(file=discord.File('libs/files/timeup.gif'))
+    await ctx.send(file=discord.File('static/timeup.gif'))
     
 
 @bot.command(name='zanbil', brief='Start zanbil detector',

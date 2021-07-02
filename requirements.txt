@@ -8,3 +8,5 @@ asyncio
 img2pdf
 Pillow
 pytz
+aiofiles
+aiohttp

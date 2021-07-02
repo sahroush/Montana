@@ -134,9 +134,6 @@ async def upload(name):
     return "https://gofile.io/?c=" + response
 
 
-cnt = 0
-
-
 async def makepdf(links, name):  # low memory usage but slow af
     images = []
     img_num = 1
@@ -172,27 +169,28 @@ async def fastmakepdf(links, name):  # super high memory usage but fast
     return filename
 
 
+_pdfsem = asyncio.Semaphore(5)
 async def send_pdf(ctx, name, links):
     if len(name) > 25:
         name = name[:20]
     originalname = name
     loading = await ctx.send(file=discord.File('libs/files/loading.gif'))
-    global cnt
-    while cnt >= 9:
-        await asyncio.sleep(2)
-    cnt += 1
-    name += str(random.randint(0, 1000000000))
-    if len(links) > 50:
-        filename = await makepdf(links, name)
-    else:
-        filename = await fastmakepdf(links, name)
-    url = await upload(filename)
-    embed = discord.Embed(title=originalname, description="", color=colors[random.randint(0, len(colors) - 1)],
-                          url=url)
-    await ctx.send(embed=embed)
-    os.remove(filename)
-    await loading.delete()
-    cnt -= 1
+    async with _pdfsem:
+        name += str(random.randint(0, 1000000000))
+        if len(links) > 50:
+            filename = await makepdf(links, name)
+        else:
+            filename = await fastmakepdf(links, name)
+        url = await upload(filename)
+        embed = discord.Embed(
+            title=originalname,
+            description="",
+            color=colors[random.randint(0, len(colors) - 1)],
+            url=url
+        )
+        await ctx.send(embed=embed)
+        os.remove(filename)
+        await loading.delete()
 
 
 def fib(n):

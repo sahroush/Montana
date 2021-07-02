@@ -154,7 +154,7 @@ async def send_pdf(ctx, name, links):
     if len(name) > 25:
         name = name[:20]
     originalname = name
-    loading = await ctx.send(file=discord.File('libs/files/loading.gif'))
+    loading = await ctx.send(file=discord.File('static/loading.gif'))
     async with _pdfsem:
         name += str(random.randint(0, 1000000000))
         filename = await async_makepdf(links, name)

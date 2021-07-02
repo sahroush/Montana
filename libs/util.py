@@ -141,7 +141,8 @@ async def async_makepdf(session, links, name):
                 content = await resp.content.read()
             imgio = img2pdf.BytesIO(content)
             image = Image.open(imgio).convert('RGB')
-            image.save(image_filename, format='PNG')
+            # Unknown ExifOrientationError on PNG format
+            image.save(image_filename, format='JPEG')
             files.append(image_filename)
         filename = f'{name}.pdf'
         async with aiofiles.open(filename, mode='wb') as file:

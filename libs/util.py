@@ -14,7 +14,7 @@ colors = [0, 1752220, 3066993, 3447003, 10181046, 15844367, 15105570, 15158332,
 
 
 def wrapped(s):
-    wrapper = textwrap.TextWrapper(width=20)
+    wrapper = textwrap.TextWrapper(width=32)
     word_list = wrapper.wrap(text=s)
     s = ""
     for word in word_list:
@@ -60,7 +60,13 @@ async def pagify(bot, ctx, links, names, public=False):
 
     def embed_creator():
         nonlocal cur
-        embed = discord.Embed(title=wrapped(names[cur]), description="", color=242424, url=links[cur])
+        title = names[cur]
+        description = ""
+        if len(title) > 256:
+            description = "..." + title[100:]
+            title = title[:100] + "..."
+
+        embed = discord.Embed(title=title, description=description, color=242424, url=links[cur])
         embed.set_footer(text=str(cur + 1) + "/" + str(len(links)))
         embed.set_image(url=links[cur])
         return embed

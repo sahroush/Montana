@@ -1,12 +1,12 @@
-import textwrap
-import discord
 import asyncio
-import random
-import requests
-import img2pdf
 import os
+import random
+import textwrap
+
+import discord
+import img2pdf
+import requests
 from PIL import Image  # cuz alpha is a bitch
-from collections import namedtuple
 
 colors = [0, 1752220, 3066993, 3447003, 10181046, 15844367, 15105570, 15158332,
           9807270, 8359053, 3426654, 1146986, 2067276, 2123412, 7419530, 12745742,

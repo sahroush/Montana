@@ -1,12 +1,12 @@
-import textwrap
-import discord
 import asyncio
-import random
-import requests
-import img2pdf
 import os
+import random
+import textwrap
+
+import discord
+import img2pdf
+import requests
 from PIL import Image  # cuz alpha is a bitch
-from collections import namedtuple
 
 colors = [0, 1752220, 3066993, 3447003, 10181046, 15844367, 15105570, 15158332,
           9807270, 8359053, 3426654, 1146986, 2067276, 2123412, 7419530, 12745742,
@@ -14,7 +14,7 @@ colors = [0, 1752220, 3066993, 3447003, 10181046, 15844367, 15105570, 15158332,
 
 
 def wrapped(s):
-    wrapper = textwrap.TextWrapper(width=20)
+    wrapper = textwrap.TextWrapper(width=32)
     word_list = wrapper.wrap(text=s)
     s = ""
     for word in word_list:
@@ -54,69 +54,6 @@ def make_embed(text):
     return discord.Embed(description=str(text), color=colors[random.randint(0, len(colors) - 1)])
 
 
-async def pagify(bot, ctx, links, names, public=False):
-    cur = 0
-    emojis = namedtuple("Emoji", ["prev", "next", "remove"])("⏪", "⏩", "🗑")
-
-    def embed_creator():
-        nonlocal cur
-        embed = discord.Embed(title=wrapped(names[cur]), description="", color=242424, url=links[cur])
-        embed.set_footer(text=str(cur + 1) + "/" + str(len(links)))
-        embed.set_image(url=links[cur])
-        return embed
-
-    def reaction_trigger(reaction, user):
-        if reaction.message.id != message.id:  # reacted on other messages
-            return False
-        if user == message.author:  # the reaction was made by the bot itself
-            return False
-        if not public and user != ctx.author:  # made by other users
-            return False
-        if str(reaction) not in emojis:  # not trigger emoji
-            return False
-        return True  # made by user || third party
-
-    async def react_handler(reaction, user):
-        nonlocal cur
-
-        react_emoji = str(reaction)
-        await message.remove_reaction(reaction, user)
-
-        if react_emoji == emojis.remove:
-            await message.delete()
-            await ctx.message.delete()
-            return True
-
-        if react_emoji == emojis.next and cur < len(links) - 1:
-            cur += 1
-            await message.edit(embed=embed_creator())
-
-        elif react_emoji == emojis.prev and cur > 0:
-            cur -= 1
-            await message.edit(embed=embed_creator())
-
-        return False
-
-    message = await ctx.send(embed=embed_creator())
-    for emoji in emojis:
-        await message.add_reaction(emoji)
-
-    while True:
-        try:
-            reaction, user = await bot.wait_for("reaction_add", timeout=180, check=reaction_trigger)
-            if await react_handler(reaction, user):
-                break
-        except asyncio.TimeoutError:
-            try:
-                for emoji in emojis:
-                    await message.clear_reaction(emoji)
-            except discord.NotFound:
-                pass
-            break
-        except:
-            break
-
-
 async def upload(name):
     best_server = requests.get('https://apiv2.gofile.io/getServer').json()
     server = best_server['data']['server']
@@ -126,9 +63,6 @@ async def upload(name):
     response = requests.post('https://' + server + \
                              '.gofile.io/uploadFile', files=files).json()['data']['code']
     return "https://gofile.io/?c=" + response
-
-
-cnt = 0
 
 
 async def makepdf(links, name):  # low memory usage but slow af
@@ -166,27 +100,28 @@ async def fastmakepdf(links, name):  # super high memory usage but fast
     return filename
 
 
+_pdfsem = asyncio.Semaphore(5)
 async def send_pdf(ctx, name, links):
     if len(name) > 25:
         name = name[:20]
     originalname = name
     loading = await ctx.send(file=discord.File('libs/files/loading.gif'))
-    global cnt
-    while cnt >= 9:
-        await asyncio.sleep(2)
-    cnt += 1
-    name += str(random.randint(0, 1000000000))
-    if len(links) > 50:
-        filename = await makepdf(links, name)
-    else:
-        filename = await fastmakepdf(links, name)
-    url = await upload(filename)
-    embed = discord.Embed(title=originalname, description="", color=colors[random.randint(0, len(colors) - 1)],
-                          url=url)
-    await ctx.send(embed=embed)
-    os.remove(filename)
-    await loading.delete()
-    cnt -= 1
+    async with _pdfsem:
+        name += str(random.randint(0, 1000000000))
+        if len(links) > 50:
+            filename = await makepdf(links, name)
+        else:
+            filename = await fastmakepdf(links, name)
+        url = await upload(filename)
+        embed = discord.Embed(
+            title=originalname,
+            description="",
+            color=colors[random.randint(0, len(colors) - 1)],
+            url=url
+        )
+        await ctx.send(embed=embed)
+        os.remove(filename)
+        await loading.delete()
 
 
 def fib(n):

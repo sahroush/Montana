@@ -8,6 +8,7 @@ from discord.ext import commands
 from libs.reddit import *
 from libs.util import *
 from libs.nhparser import *
+from libs.paginator import Paginator
 
 TOKEN = os.getenv("TOKEN")
 intents = discord.Intents.all()  # Not good choice
@@ -104,7 +105,8 @@ async def album(ctx, sub, *args):
     if "+pdf" in args:
         await send_pdf(ctx, sub, links)
     else:
-        await pagify(bot, ctx, links, names)
+        paginator = Paginator(bot, ctx, names, links)
+        await paginator.pagify()
 
 
 @bot.command(name='nhentai',
@@ -130,7 +132,8 @@ async def nhentai(ctx, sixdigit: int, *args):
     if "+pdf" in args:
         await send_pdf(ctx, name, posts)
     else:
-        await pagify(bot, ctx, posts, names)
+        paginator = Paginator(bot, ctx, names, posts)
+        await paginator.pagify()
 
 
 @bot.command(name='ping', help="Used to test Montana's response time.")

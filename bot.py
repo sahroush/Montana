@@ -40,11 +40,11 @@ async def echo(ctx, *response):
     await ctx.send(" ".join(response))
 
 
-"""rip mashtali 2020-2021
+"""rip mashtali 2020-2021 , mashtali is back! :yayy:
+"""
 @bot.command(name='mashtali', aliases=['shahali'], hidden=True)
 async def mashtali(ctx):
     await ctx.send("takhte: <https://idroo.com/board-5odTuNxlSF>" + '\n' + "doc: <https://docs.google.com/spreadsheets/d/1rWpFA3IQz7okNZNWhoYKuaHGbp9jVUol37P2WNr2KWc>")
-"""
 
 
 @bot.command(name='vote', help='Starts a vote', usage="<\"question\"> [\"options\"...]")

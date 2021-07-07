@@ -99,10 +99,10 @@ async def album(ctx, sub, *args):
     if "+random" in args:
         random.shuffle(posts)
     names, links = list(zip(*posts))
-    if "+pdf" in args:
-        await send_pdf(ctx, sub, links)
-    elif "+zip" in args:
+    if "+zip" in args:
         await send_zip(ctx, sub, links)
+    elif "+pdf" in args:
+        await send_pdf(ctx, sub, links)
     else:
         paginator = Paginator(bot, ctx, names, links)
         await paginator.pagify()
@@ -111,11 +111,12 @@ async def album(ctx, sub, *args):
 @bot.command(name='nhentai',
              help='posts the given sauce \n'
                   'nsfw is off in sfw channels unless +nsfw is used \n'
-                  'sends a pdf instead of an album when +pdf is used',
+                  'sends a pdf instead of an album when +pdf is used \n'
+                  'sends a zip instead of an album when +zip is used',
              usage="<source number> [+nsfw][+pdf]", hidden=True)
 async def nhentai(ctx, sixdigit: int, *args):
     posts, name = fetch_hentai(sixdigit)
-    if ctx.channel.type is discord.ChannelType.private and "+pdf" not in args:
+    if ctx.channel.type is discord.ChannelType.private and "+pdf" not in args and "+zip" not in args:
         response = "Sorry, this command is not available in DMs :sob:"
         await ctx.send(response)
         return
@@ -128,7 +129,9 @@ async def nhentai(ctx, sixdigit: int, *args):
         await ctx.send(response)
         return
     names = [name] * len(posts)
-    if "+pdf" in args:
+    if "+zip" in args:
+        await send_zip(ctx, name, posts)
+    elif "+pdf" in args:
         await send_pdf(ctx, name, posts)
     else:
         paginator = Paginator(bot, ctx, names, posts)

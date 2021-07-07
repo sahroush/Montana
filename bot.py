@@ -26,12 +26,20 @@ starting_time = time.time()
 localtz = pytz.timezone("Asia/Tehran")
 
 
+async def send_log(msg):
+    if LOG_CHANNEL is None:
+        return
+    channel = bot.get_channel(int(LOG_CHANNEL))
+    await channel.send(f'```\n{msg}\n```')
+
+
 @bot.event
 async def on_ready():
     global starting_time
     starting_time = time.time()
     await bot.change_presence(activity=discord.Game(name="Use `help!"))
     print(f'{bot.user.name} has connected to Discord!')
+    await send_log(f'{bot.user.name} Started at {datetime.now(localtz)}')
 
 
 @bot.event
@@ -296,9 +304,7 @@ async def on_command_error(ctx, error):
         trace = tb.format_exception(type(error), error, error.__traceback__)
         trace = [line for frame in trace for line in frame.split(r'\n')]
         trace = ''.join(trace)
-        trace = f'```\n{trace}\n```'
-        channel = bot.get_channel(int(LOG_CHANNEL))
-        await channel.send(trace)
+        await send_log(trace)
 
 
 bot.run(TOKEN)

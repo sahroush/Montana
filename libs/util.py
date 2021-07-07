@@ -11,6 +11,14 @@ import img2pdf
 import requests # keep for backward compatibility
 from zipstream import AioZipStream
 from PIL import Image  # cuz alpha is a bitch
+from mega import Mega
+
+mega = Mega()
+
+def megalogin(username, password):
+    global mega
+    mega = mega.login(username, password)
+    
 
 colors = [0, 1752220, 3066993, 3447003, 10181046, 15844367, 15105570, 15158332,
           9807270, 8359053, 3426654, 1146986, 2067276, 2123412, 7419530, 12745742,
@@ -73,7 +81,7 @@ async def filesender(file_name=None):
             yield chunk
             chunk = await f.read(64*1024)
 
-
+"""no idea how much I'll fuck up :p
 @with_session
 async def upload(session, name):
     async with session.get('https://apiv2.gofile.io/getServer') as resp:
@@ -91,7 +99,10 @@ async def upload(session, name):
         data = await resp.json()
         code = data['data']['code']
     return f"https://gofile.io/?c={code}"
+"""
 
+async def upload(name):
+    return mega.get_upload_link(mega.upload(name))
 
 async def makepdf(links, name):  # low memory usage but slow af
     images = []

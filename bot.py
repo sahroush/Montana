@@ -14,6 +14,9 @@ from libs.reddit import *
 from libs.util import *
 
 TOKEN = os.getenv("TOKEN")
+Musername = os.getenv("MEGAemail")
+Mpassword = os.getenv("MEGApassword")
+megalogin(Musername, Mpassword)
 LOG_CHANNEL = os.getenv("LOG_CHANNEL")
 intents = discord.Intents.all()  # Not good choice
 bot = commands.Bot(command_prefix=commands.when_mentioned_or('`'), intents=intents)

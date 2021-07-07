@@ -81,11 +81,12 @@ async def patak(ctx , *options):
                                 'nsfw is off in sfw channels unless +nsfw is used \n'
                                 'shuffles posts when +random is used'
                                 'sends a pdf instead of an album when +pdf is used',
-             usage="<subreddit> [+nsfw][+random][+pdf]")
+                                'sends a zip instead of an album when +zip is used',
+             usage="<subreddit> [+nsfw][+random][+pdf][+zip]")
 async def album(ctx, sub, *args):
     sfw, nsfw = await fetch(sub, "+pdf" in args)  # pdf ==> no gifs
     posts = sfw
-    if ctx.channel.type is discord.ChannelType.private and "+pdf" not in args:
+    if ctx.channel.type is discord.ChannelType.private and "+pdf" not in args and "+zip" not in args:
         response = "Sorry, this command is not available in DMs :sob:"
         await ctx.send(response)
         return
@@ -100,6 +101,8 @@ async def album(ctx, sub, *args):
     names, links = list(zip(*posts))
     if "+pdf" in args:
         await send_pdf(ctx, sub, links)
+    elif "+zip" in args:
+        await send_zip(ctx, sub, links)
     else:
         paginator = Paginator(bot, ctx, names, links)
         await paginator.pagify()

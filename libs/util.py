@@ -10,6 +10,7 @@ import discord
 import img2pdf
 import requests # keep for backward compatibility
 from PIL import Image  # cuz alpha is a bitch
+from zipstream import AioZipStream
 
 colors = [0, 1752220, 3066993, 3447003, 10181046, 15844367, 15105570, 15158332,
           9807270, 8359053, 3426654, 1146986, 2067276, 2123412, 7419530, 12745742,
@@ -174,6 +175,54 @@ async def send_pdf(ctx, name, links):
         os.remove(filename)
         await loading.delete()
 
+
+async def async_zip(filename, files):
+    # larger chunk size will increase performance
+    aiozip = AioZipStream(files, chunksize=32768)
+    async with aiofiles.open(filename, mode='wb') as z:
+        async for chunk in aiozip.stream():
+            await z.write(chunk)
+
+@with_session
+async def async_makezip(session, links, name):
+    with tempfile.TemporaryDirectory() as tempdir:
+        files = []
+        for i, link in enumerate(links):
+            async with session.head(link, allow_redirects=True) as resp:
+                size = int(resp.headers.get('Content-Length', -1))
+            if size > 5e6:  # 5 MB
+                continue
+            image_filename = f'{tempdir}/{i}.idk'
+            async with session.get(link) as resp:
+                content = await resp.content.read()
+            imgio = img2pdf.BytesIO(content)
+            image = Image.open(imgio).convert('RGB')
+            # Unknown ExifOrientationError on PNG format
+            image.save(image_filename, format='JPEG')
+            files.append({'file' : image_filename})
+        filename = f'{name}.pdf'
+        await async_zip(filename, files)
+    return filename
+
+_zipsem = asyncio.Semaphore(2)
+async def send_zip(ctx, name, links):
+    if len(name) > 25:
+        name = name[:20]
+    originalname = name
+    loading = await ctx.send(file=discord.File('static/loading.gif'))
+    async with _zipsem:
+        name += str(random.randint(0, 1000000000))
+        filename = await async_makezip(links, name)
+        url = await upload(filename)
+        embed = discord.Embed(
+            title=originalname,
+            description="",
+            color=random.choice(colors),
+            url=url
+        )
+        await ctx.send(embed=embed)
+        os.remove(filename)
+        await loading.delete()
 
 def fib(n):
     a, b = 0, 1

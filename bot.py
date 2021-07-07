@@ -11,6 +11,9 @@ from libs.nhparser import *
 from libs.paginator import Paginator
 
 TOKEN = os.getenv("TOKEN")
+Musername = os.getenv("MEGAemail")
+Mpassword = os.getenv("MEGApassword")
+megalogin(Musername, Mpassword)
 intents = discord.Intents.all()  # Not good choice
 bot = commands.Bot(command_prefix=commands.when_mentioned_or('`'), intents=intents)
 STATUS = Status.online

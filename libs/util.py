@@ -523,8 +523,8 @@ async def async_makezip(session, links, name):
             image = Image.open(imgio).convert('RGB')
             # Unknown ExifOrientationError on PNG format
             image.save(image_filename, format='JPEG')
-            files.append({'file' : image_filename})
-        filename = f'{name}.pdf'
+            files.append({'file' : image_filename , name + imagefilename[ : -4] + '.jpg'})
+        filename = f'{name}.zip'
         await async_zip(filename, files)
     return filename
 

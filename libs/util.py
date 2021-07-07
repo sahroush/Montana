@@ -129,54 +129,43 @@ async def fastmakepdf(links, name):  # super high memory usage but fast
 
 
 @with_session
-async def async_makepdf(session, links, name):
+async def download_images(session, directory, links):
+    files = []
+    for i, link in enumerate(links):
+        async with session.head(link, allow_redirects=True) as resp:
+            size = int(resp.headers.get('Content-Length', -1))
+        if size > 5e6:  # 5 MB
+            continue
+        image_filename = f'{directory}/{i}.jpg'
+        async with session.get(link) as resp:
+            content = await resp.content.read()
+        imgio = img2pdf.BytesIO(content)
+        image = Image.open(imgio).convert('RGB')
+        # Unknown ExifOrientationError on PNG format
+        image.save(image_filename, format='JPEG')
+        files.append(image_filename)
+    return files
+
+
+async def async_makepdf(links, name):
     with tempfile.TemporaryDirectory() as tempdir:
-        files = []
-        for i, link in enumerate(links):
-            async with session.head(link, allow_redirects=True) as resp:
-                size = int(resp.headers.get('Content-Length', -1))
-            if size > 5e6:  # 5 MB
-                continue
-            image_filename = f'{tempdir}/{i}.idk'
-            async with session.get(link) as resp:
-                content = await resp.content.read()
-            imgio = img2pdf.BytesIO(content)
-            image = Image.open(imgio).convert('RGB')
-            # Unknown ExifOrientationError on PNG format
-            image.save(image_filename, format='JPEG')
-            files.append(image_filename)
+        files = await download_images(tempdir, links)
         filename = f'{name}.pdf'
         async with aiofiles.open(filename, mode='wb') as file:
             await file.write(img2pdf.convert(files))
     return filename
 
 
-async def write_zipfile(zipfile, files):
-    # larger chunk size will increase performance
-    aiozip = AioZipStream(files, chunksize=32768)
-    async with aiofiles.open(zipfile, mode='wb') as z:
-        async for chunk in aiozip.stream():
-            await z.write(chunk)
-
-@with_session
-async def async_makezip(session, links, name):
+async def async_makezip(links, name):
     with tempfile.TemporaryDirectory() as tempdir:
-        files = []
-        for i, link in enumerate(links):
-            async with session.head(link, allow_redirects=True) as resp:
-                size = int(resp.headers.get('Content-Length', -1))
-            if size > 5e6:  # 5 MB
-                continue
-            image_filename = f'{tempdir}/{i}.idk'
-            async with session.get(link) as resp:
-                content = await resp.content.read()
-            imgio = img2pdf.BytesIO(content)
-            image = Image.open(imgio).convert('RGB')
-            # Unknown ExifOrientationError on PNG format
-            image.save(image_filename, format='JPEG')
-            files.append({'file' : image_filename , 'name' : name + image_filename[ : -4] + '.jpg'})
+        files = await download_images(tempdir, links)
+        files = [{'file': _file} for _file in files]
         filename = f'{name}.zip'
-        await write_zipfile(filename, files)
+        # larger chunk size will increase performance
+        aiozip = AioZipStream(files, chunksize=32768)
+        async with aiofiles.open(filename, mode='wb') as file:
+            async for chunk in aiozip.stream():
+                await file.write(chunk)
     return filename
 
 

@@ -9,6 +9,7 @@ import aiofiles
 import discord
 import img2pdf
 import requests # keep for backward compatibility
+from zipstream import AioZipStream
 from PIL import Image  # cuz alpha is a bitch
 
 colors = [0, 1752220, 3066993, 3447003, 10181046, 15844367, 15105570, 15158332,
@@ -128,41 +129,59 @@ async def fastmakepdf(links, name):  # super high memory usage but fast
 
 
 @with_session
-async def async_makepdf(session, links, name):
+async def download_images(session, directory, links):
+    files = []
+    for i, link in enumerate(links):
+        async with session.head(link, allow_redirects=True) as resp:
+            size = int(resp.headers.get('Content-Length', -1))
+        if size > 5e6:  # 5 MB
+            continue
+        image_filename = f'{directory}/{i}.jpg'
+        async with session.get(link) as resp:
+            content = await resp.content.read()
+        imgio = img2pdf.BytesIO(content)
+        image = Image.open(imgio).convert('RGB')
+        # Unknown ExifOrientationError on PNG format
+        image.save(image_filename, format='JPEG')
+        files.append(image_filename)
+    return files
+
+
+async def async_makepdf(links, name):
     with tempfile.TemporaryDirectory() as tempdir:
-        files = []
-        for i, link in enumerate(links):
-            async with session.head(link, allow_redirects=True) as resp:
-                size = int(resp.headers.get('Content-Length', -1))
-            if size > 5e6:  # 5 MB
-                continue
-            image_filename = f'{tempdir}/{i}.idk'
-            async with session.get(link) as resp:
-                content = await resp.content.read()
-            imgio = img2pdf.BytesIO(content)
-            image = Image.open(imgio).convert('RGB')
-            # Unknown ExifOrientationError on PNG format
-            image.save(image_filename, format='JPEG')
-            files.append(image_filename)
+        files = await download_images(tempdir, links)
         filename = f'{name}.pdf'
         async with aiofiles.open(filename, mode='wb') as file:
             await file.write(img2pdf.convert(files))
     return filename
 
 
-_pdfsem = asyncio.Semaphore(2)
-async def send_pdf(ctx, name, links):
+async def async_makezip(links, name):
+    with tempfile.TemporaryDirectory() as tempdir:
+        files = await download_images(tempdir, links)
+        files = [{'file': _file} for _file in files]
+        filename = f'{name}.zip'
+        # larger chunk size will increase performance
+        aiozip = AioZipStream(files, chunksize=32768)
+        async with aiofiles.open(filename, mode='wb') as file:
+            async for chunk in aiozip.stream():
+                await file.write(chunk)
+    return filename
+
+
+_filesemaphore = asyncio.Semaphore(3)
+async def send_file(ctx, name, links, file_format):
+    assert file_format in ('pdf', 'zip'), ValueError('bad file format')
     if len(name) > 25:
         name = name[:20]
     originalname = name
     loading = await ctx.send(file=discord.File('static/loading.gif'))
-    async with _pdfsem:
+    async with _filesemaphore:
         name += str(random.randint(0, 1000000000))
-        filename = await async_makepdf(links, name)
-        # if len(links) > 50:
-        #     filename = await makepdf(links, name)
-        # else:
-        #     filename = await fastmakepdf(links, name)
+        if file_format == 'pdf':
+            filename = await async_makepdf(links, name)
+        elif file_format == 'zip':
+            filename = await async_makezip(links, name)
         url = await upload(filename)
         embed = discord.Embed(
             title=originalname,
@@ -173,7 +192,6 @@ async def send_pdf(ctx, name, links):
         await ctx.send(embed=embed)
         os.remove(filename)
         await loading.delete()
-
 
 def fib(n):
     a, b = 0, 1

@@ -79,13 +79,14 @@ async def patak(ctx , *options):
 
 @bot.command(name='album', help='posts the most recent pics from the given subreddit \n'
                                 'nsfw is off in sfw channels unless +nsfw is used \n'
-                                'shuffles posts when +random is used'
-                                'sends a pdf instead of an album when +pdf is used',
-             usage="<subreddit> [+nsfw][+random][+pdf]")
+                                'shuffles posts when +random is used \n'
+                                'sends a pdf instead of an album when +pdf is used \n'
+                                'sends a zip instead of an album when +zip is used',
+             usage="<subreddit> [+nsfw][+random][+pdf][+zip]")
 async def album(ctx, sub, *args):
-    sfw, nsfw = await fetch(sub, "+pdf" in args)  # pdf ==> no gifs
+    sfw, nsfw = await fetch(sub, "+pdf" in args or "+zip" in args)  # pdf ==> no gifs
     posts = sfw
-    if ctx.channel.type is discord.ChannelType.private and "+pdf" not in args:
+    if ctx.channel.type is discord.ChannelType.private and "+pdf" not in args and "+zip" not in args:
         response = "Sorry, this command is not available in DMs :sob:"
         await ctx.send(response)
         return
@@ -98,8 +99,10 @@ async def album(ctx, sub, *args):
     if "+random" in args:
         random.shuffle(posts)
     names, links = list(zip(*posts))
-    if "+pdf" in args:
-        await send_pdf(ctx, sub, links)
+    if "+zip" in args:
+        await send_file(ctx, sub, links, 'zip')
+    elif "+pdf" in args:
+        await send_file(ctx, sub, links, 'pdf')
     else:
         paginator = Paginator(bot, ctx, names, links)
         await paginator.pagify()
@@ -108,11 +111,12 @@ async def album(ctx, sub, *args):
 @bot.command(name='nhentai',
              help='posts the given sauce \n'
                   'nsfw is off in sfw channels unless +nsfw is used \n'
-                  'sends a pdf instead of an album when +pdf is used',
+                  'sends a pdf instead of an album when +pdf is used \n'
+                  'sends a zip instead of an album when +zip is used',
              usage="<source number> [+nsfw][+pdf]", hidden=True)
 async def nhentai(ctx, sixdigit: int, *args):
     posts, name = fetch_hentai(sixdigit)
-    if ctx.channel.type is discord.ChannelType.private and "+pdf" not in args:
+    if ctx.channel.type is discord.ChannelType.private and "+pdf" not in args and "+zip" not in args:
         response = "Sorry, this command is not available in DMs :sob:"
         await ctx.send(response)
         return
@@ -125,8 +129,10 @@ async def nhentai(ctx, sixdigit: int, *args):
         await ctx.send(response)
         return
     names = [name] * len(posts)
-    if "+pdf" in args:
-        await send_pdf(ctx, name, posts)
+    if "+zip" in args:
+        await send_file(ctx, name, posts, 'zip')
+    elif "+pdf" in args:
+        await send_file(ctx, name, posts, 'pdf')
     else:
         paginator = Paginator(bot, ctx, names, posts)
         await paginator.pagify()
@@ -207,7 +213,7 @@ async def countdown(ctx, finish: str, *msg):
         await asyncio.sleep(0.98)
     await msg.edit(content="Time's Up :boom:")
     await ctx.send(file=discord.File('static/timeup.gif'))
-    
+
 
 @bot.command(name='zanbil', brief='Start zanbil detector',
              help='Start zanbil detector, write "break" or "zange" to stop')

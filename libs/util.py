@@ -14,6 +14,7 @@ import os
 import time
 import zlib
 from concurrent import futures
+from . import consts
 
 class Processor:
     def __init__(self, file_struct):

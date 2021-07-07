@@ -14,8 +14,8 @@ import os
 import time
 import zlib
 from concurrent import futures
-import consts
-
+from . import consts 
+#import consts  #if running locally 
 aio_available = True
 
 class Processor:

@@ -1,16 +1,20 @@
-import time
-import pytz
-import discord
 import random
+import time
+import traceback as tb
 from datetime import datetime, timedelta
+
+import discord
+import pytz
 from discord import Status
 from discord.ext import commands
-from libs.reddit import *
-from libs.util import *
+
 from libs.nhparser import *
 from libs.paginator import Paginator
+from libs.reddit import *
+from libs.util import *
 
 TOKEN = os.getenv("TOKEN")
+LOG_CHANNEL = os.getenv("LOG_CHANNEL")
 intents = discord.Intents.all()  # Not good choice
 bot = commands.Bot(command_prefix=commands.when_mentioned_or('`'), intents=intents)
 STATUS = Status.online
@@ -285,6 +289,13 @@ async def on_command_error(ctx, error):
     if isinstance(error, commands.CommandNotFound):
         return await ctx.message.add_reaction('\U0001F928')
     await ctx.send(embed=make_embed(error))
+    if LOG_CHANNEL:
+        trace = tb.format_exception(type(error), error, error.__traceback__)
+        trace = [line for frame in trace for line in frame.split(r'\n')]
+        trace = ''.join(trace)
+        trace = f'```\n{trace}\n```'
+        channel = bot.get_channel(int(LOG_CHANNEL))
+        await channel.send(trace)
 
 
 bot.run(TOKEN)

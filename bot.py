@@ -100,9 +100,9 @@ async def album(ctx, sub, *args):
         random.shuffle(posts)
     names, links = list(zip(*posts))
     if "+zip" in args:
-        await send_zip(ctx, sub, links)
+        await send_file(ctx, sub, links, 'zip')
     elif "+pdf" in args:
-        await send_pdf(ctx, sub, links)
+        await send_file(ctx, sub, links, 'pdf')
     else:
         paginator = Paginator(bot, ctx, names, links)
         await paginator.pagify()
@@ -130,9 +130,9 @@ async def nhentai(ctx, sixdigit: int, *args):
         return
     names = [name] * len(posts)
     if "+zip" in args:
-        await send_zip(ctx, name, posts)
+        await send_file(ctx, name, posts, 'zip')
     elif "+pdf" in args:
-        await send_pdf(ctx, name, posts)
+        await send_file(ctx, name, posts, 'pdf')
     else:
         paginator = Paginator(bot, ctx, names, posts)
         await paginator.pagify()
@@ -213,7 +213,7 @@ async def countdown(ctx, finish: str, *msg):
         await asyncio.sleep(0.98)
     await msg.edit(content="Time's Up :boom:")
     await ctx.send(file=discord.File('static/timeup.gif'))
-    
+
 
 @bot.command(name='zanbil', brief='Start zanbil detector',
              help='Start zanbil detector, write "break" or "zange" to stop')

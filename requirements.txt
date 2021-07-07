@@ -10,4 +10,4 @@ Pillow
 pytz
 aiofiles
 aiohttp
-zipstream
+aiozipstream

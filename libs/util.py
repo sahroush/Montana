@@ -16,6 +16,8 @@ import zlib
 from concurrent import futures
 from . import consts
 
+aio_available = True
+
 class Processor:
     def __init__(self, file_struct):
         self.crc = 0

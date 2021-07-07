@@ -79,8 +79,8 @@ async def patak(ctx , *options):
 
 @bot.command(name='album', help='posts the most recent pics from the given subreddit \n'
                                 'nsfw is off in sfw channels unless +nsfw is used \n'
-                                'shuffles posts when +random is used'
-                                'sends a pdf instead of an album when +pdf is used',
+                                'shuffles posts when +random is used \n'
+                                'sends a pdf instead of an album when +pdf is used \n'
                                 'sends a zip instead of an album when +zip is used',
              usage="<subreddit> [+nsfw][+random][+pdf][+zip]")
 async def album(ctx, sub, *args):

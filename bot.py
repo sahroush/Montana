@@ -128,7 +128,7 @@ async def album(ctx, sub, *args):
                   'nsfw is off in sfw channels unless +nsfw is used \n'
                   'sends a pdf instead of an album when +pdf is used \n'
                   'sends a zip instead of an album when +zip is used',
-             usage="<source number> [+nsfw][+pdf]", hidden=True)
+             usage="<source number> [+nsfw][+pdf][+zip]", hidden=True)
 async def nhentai(ctx, sixdigit: int, *args):
     posts, name = fetch_hentai(sixdigit)
     if ctx.channel.type is discord.ChannelType.private and "+pdf" not in args and "+zip" not in args:

@@ -1,7 +1,6 @@
 requests
 discord.py
 python-dotenv
-nhentai.py==1.0.5
 bs4
 lxml
 asyncio
